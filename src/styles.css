@@ -1,0 +1,354 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root and .dark blocks define the actual color values using oklch.
+ * All colors MUST use oklch format.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-strong: var(--strong);
+  --color-moderate: var(--moderate);
+  --color-weak: var(--weak);
+  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-sans: "Work Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  /* Monochrome and sharp-edged, after the Parallax mark: ink on paper. */
+  --radius: 0.125rem;
+  --background: oklch(0.992 0 0);
+  --foreground: oklch(0.24 0.004 350);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.24 0.004 350);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.24 0.004 350);
+  --primary: oklch(0.24 0.004 350);
+  --primary-foreground: oklch(0.992 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.24 0.004 350);
+  --muted: oklch(0.962 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.24 0.004 350);
+  --accent-foreground: oklch(0.992 0 0);
+  --destructive: oklch(0.55 0.2 27);
+  --destructive-foreground: oklch(0.98 0 0);
+  --border: oklch(0.895 0 0);
+  --input: oklch(0.86 0 0);
+  --ring: oklch(0.24 0.004 350);
+  --strong: oklch(0.52 0.12 150);
+  --moderate: oklch(0.68 0.14 80);
+  --weak: oklch(0.58 0.18 30);
+  --chart-1: oklch(0.24 0.004 350);
+  --chart-2: oklch(0.52 0.12 150);
+  --chart-3: oklch(0.45 0.08 240);
+  --chart-4: oklch(0.68 0.14 80);
+  --chart-5: oklch(0.5 0.1 300);
+  --sidebar: oklch(0.975 0 0);
+  --sidebar-foreground: oklch(0.24 0.004 350);
+  --sidebar-primary: oklch(0.24 0.004 350);
+  --sidebar-primary-foreground: oklch(0.992 0 0);
+  --sidebar-accent: oklch(0.95 0 0);
+  --sidebar-accent-foreground: oklch(0.24 0.004 350);
+  --sidebar-border: oklch(0.895 0 0);
+  --sidebar-ring: oklch(0.24 0.004 350);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+}
+
+@layer base {
+  body { font-family: var(--font-sans); }
+  h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+}
+
+@utility cite-chip {
+  font-family: var(--font-mono);
+  font-size: 0.68em;
+  padding: 0 0.3em;
+  margin-left: 0.1em;
+  border-radius: 0.2rem;
+  vertical-align: super;
+  background: color-mix(in oklch, var(--accent) 14%, transparent);
+  color: var(--accent);
+  text-decoration: none;
+}
+
+@utility grid-paper {
+  background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion
+ * ------------------------------------------------------------------------- */
+
+@keyframes indeterminate {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(300%); }
+}
+
+.indeterminate-bar {
+  animation: indeterminate 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Page changes cross-fade; the header keeps its own layer so it holds still. */
+.app-header {
+  view-transition-name: app-header;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Clicking a citation glides to its source and briefly highlights it. */
+html {
+  scroll-behavior: smooth;
+}
+
+@keyframes source-flash {
+  from { background-color: color-mix(in oklch, var(--accent) 18%, transparent); }
+  to { background-color: transparent; }
+}
+
+.source-row:target {
+  animation: source-flash 1.6s ease-out;
+  border-radius: 0.25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Landing page
+ * ------------------------------------------------------------------------- */
+
+/* The mark's shards sit at different depths and drift apart with the pointer. */
+.mark-shard {
+  transform: translate(calc(var(--px, 0) * var(--depth) * 1px), calc(var(--py, 0) * var(--depth) * 1px));
+  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes shard-in {
+  from {
+    opacity: 0;
+    transform: translate(calc(var(--from-x) * 1px), calc(var(--from-y) * 1px));
+  }
+}
+
+.mark-assemble .mark-shard {
+  animation: shard-in 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.rise-in {
+  animation: rise-in 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+/* Sections ease in as they scroll into view. Browsers without scroll-driven
+ * animations simply show them. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+.hero-grid {
+  mask-image: radial-gradient(ellipse 70% 65% at 70% 40%, black, transparent);
+  opacity: 0.55;
+}
+
+/* ---------------------------------------------------------------------------
+ * Workspace
+ * ------------------------------------------------------------------------- */
+
+/* The sidebar and top bar hold still while the page beside them cross-fades. */
+.app-sidebar {
+  view-transition-name: app-sidebar;
+}
+
+.workspace-bar {
+  view-transition-name: workspace-bar;
+}
+
+/* Printing a report: the page only, no chrome. */
+@media print {
+  .app-sidebar,
+  .workspace-bar,
+  [data-sonner-toaster] {
+    display: none !important;
+  }
+
+  body {
+    background: white;
+  }
+}
+
+/* A report section that can be clicked to start editing it. */
+.editable-region {
+  cursor: pointer;
+  outline: 1px dashed transparent;
+  outline-offset: 10px;
+  transition: outline-color 150ms;
+}
+
+.editable-region:hover {
+  outline-color: var(--border);
+}
+
+@media print {
+  .editable-region {
+    outline: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Touch and small screens
+ * ------------------------------------------------------------------------- */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  /* The grey flash on tap reads as lag; controls show their own pressed state. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* No double-tap-to-zoom delay on controls. */
+a,
+button,
+[role="radio"],
+[role="switch"],
+[role="menuitem"] {
+  touch-action: manipulation;
+}
+
+/* iOS zooms the page when a focused field's text is under 16px, and never
+ * zooms back. Larger text (a report title being edited) keeps its size. */
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select {
+    font-size: max(16px, 1em);
+  }
+}
+
+/* Small controls get a finger-sized hit area without growing on screen. */
+@media (pointer: coarse) {
+  [role="switch"],
+  .cite-chip {
+    position: relative;
+  }
+
+  [role="switch"]::after,
+  .cite-chip::after {
+    content: "";
+    position: absolute;
+    inset: -12px -8px;
+  }
+
+  /* The navigation drawer: taller rows, larger type. */
+  [data-mobile="true"] [data-sidebar="menu-button"] {
+    min-height: 2.75rem;
+    font-size: 1rem;
+  }
+}
+
+/* Bars pinned to the bottom edge stay clear of the home indicator. */
+.pb-safe {
+  padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+}
+
+.bottom-safe {
+  bottom: max(1rem, env(safe-area-inset-bottom));
+}
