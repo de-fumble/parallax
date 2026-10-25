@@ -306,6 +306,8 @@ function Landing() {
           <nav className="flex gap-2">
             <Link to="/research" className="px-2 py-2 transition-colors hover:text-foreground">Workspace</Link>
             <Link to="/auth" className="px-2 py-2 transition-colors hover:text-foreground">Sign in</Link>
+            <Link to="/privacy" className="px-2 py-2 transition-colors hover:text-foreground">Privacy Policy</Link>
+            <Link to="/terms" className="px-2 py-2 transition-colors hover:text-foreground">Terms of Service</Link>
           </nav>
         </div>
       </footer>

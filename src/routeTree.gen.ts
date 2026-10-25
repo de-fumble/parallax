@@ -12,6 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkspaceRouteImport } from './routes/_workspace'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WorkspaceHistoryRouteImport } from './routes/_workspace.history'
 import { Route as WorkspaceOrgRouteImport } from './routes/_workspace.org'
 import { Route as WorkspaceOrganizationRouteImport } from './routes/_workspace.organization'
@@ -47,6 +49,16 @@ const WorkspaceRoute = WorkspaceRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WorkspaceHistoryRoute = WorkspaceHistoryRouteImport.update({
@@ -169,6 +181,8 @@ const WorkspaceOrgReviewsNewRoute = WorkspaceOrgReviewsNewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/history': typeof WorkspaceHistoryRoute
   '/org': typeof WorkspaceOrgRouteWithChildren
   '/organization': typeof WorkspaceOrganizationRoute
@@ -195,6 +209,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/history': typeof WorkspaceHistoryRoute
   '/organization': typeof WorkspaceOrganizationRoute
   '/research': typeof WorkspaceResearchRoute
@@ -222,6 +238,8 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_workspace': typeof WorkspaceRouteWithChildren
   '/auth': typeof AuthRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/_workspace/history': typeof WorkspaceHistoryRoute
   '/_workspace/org': typeof WorkspaceOrgRouteWithChildren
   '/_workspace/organization': typeof WorkspaceOrganizationRoute
@@ -250,6 +268,8 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/privacy'
+    | '/terms'
     | '/history'
     | '/org'
     | '/organization'
@@ -276,6 +296,8 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/privacy'
+    | '/terms'
     | '/history'
     | '/organization'
     | '/research'
@@ -302,6 +324,8 @@ export interface FileRouteTypes {
     | '/'
     | '/_workspace'
     | '/auth'
+    | '/privacy'
+    | '/terms'
     | '/_workspace/history'
     | '/_workspace/org'
     | '/_workspace/organization'
@@ -330,6 +354,8 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   WorkspaceRoute: typeof WorkspaceRouteWithChildren
   AuthRoute: typeof AuthRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   ApiWorkerRoute: typeof ApiWorkerRoute
   JoinCodeRoute: typeof JoinCodeRoute
 }
@@ -355,6 +381,20 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_workspace/history': {
@@ -578,6 +618,8 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   WorkspaceRoute: WorkspaceRouteWithChildren,
   AuthRoute: AuthRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   ApiWorkerRoute: ApiWorkerRoute,
   JoinCodeRoute: JoinCodeRoute,
 }

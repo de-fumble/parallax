@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -137,6 +137,10 @@ function AuthPage() {
         <button className="mt-2 py-3 text-sm text-muted-foreground underline" onClick={() => setMode(mode === "in" ? "up" : "in")}>
           {mode === "in" ? "No account? Sign up" : "Have an account? Sign in"}
         </button>
+        <p className="mt-6 text-xs text-muted-foreground">
+          By continuing you agree to our <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link> and{" "}
+          <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
+        </p>
       </main>
   );
 }
