@@ -160,10 +160,9 @@ function SampleReport() {
 
 function Landing() {
   return (
-    <main>
+    <main className="landing-uniform">
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-border">
-        <div aria-hidden className="grid-paper hero-grid pointer-events-none absolute inset-0" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 pb-16 pt-12 sm:gap-12 sm:px-6 sm:pb-24 sm:pt-16 md:pt-24 lg:grid-cols-[1.15fr_0.85fr]">
           <div>
             <div className="rise-in" style={{ "--i": 0 } as React.CSSProperties}>
@@ -302,7 +301,7 @@ function Landing() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-6 sm:px-6 sm:py-8 text-sm text-muted-foreground">
           <div className="flex items-center gap-2.5 text-foreground">
             <ParallaxMark className="h-5 w-auto" />
-            <span className="font-serif text-xl leading-none">Parallax</span>
+            <span className="landing-uniform font-serif text-xl font-semibold leading-none">Parallax</span>
           </div>
           <nav className="flex gap-2">
             <Link to="/research" className="px-2 py-2 transition-colors hover:text-foreground">Workspace</Link>

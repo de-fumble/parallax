@@ -275,7 +275,7 @@ function Research() {
             className={`${run.status === "paused" ? "mt-6" : "mt-8"} grid items-start gap-6 pb-24 lg:grid-cols-[minmax(0,1fr)_19rem] lg:pb-0`}
           >
             <div className="space-y-6">
-              <section className="border border-border bg-card">
+              <section data-tour="question" className="border border-border bg-card">
                 <header className="border-b border-border px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                   Question
                 </header>
@@ -304,7 +304,7 @@ function Research() {
                 </div>
               </section>
 
-              <section className="border border-border bg-card">
+              <section data-tour="sources" className="border border-border bg-card">
                 <header className="border-b border-border px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                   Sources
                 </header>
@@ -428,7 +428,7 @@ function Research() {
             </div>
 
             <aside className="space-y-6 lg:sticky lg:top-20">
-              <section className="border border-border bg-card">
+              <section data-tour="depth" className="border border-border bg-card">
                 <header className="border-b border-border px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                   Depth
                 </header>
@@ -449,7 +449,7 @@ function Research() {
               </section>
 
               {workspace.org && projects.data && projects.data.length > 0 && (
-                <section className="border border-border bg-card">
+                <section data-tour="draft-target" className="border border-border bg-card">
                   <header className="border-b border-border px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
                     Draft it in a project
                   </header>
@@ -472,7 +472,7 @@ function Research() {
                 </section>
               )}
 
-              <section className="border border-border bg-card p-5">
+              <section data-tour="run" className="border border-border bg-card p-5">
                 <dl className="space-y-2 text-sm">
                   <div className="flex justify-between gap-4">
                     <dt className="text-muted-foreground">Saves to</dt>

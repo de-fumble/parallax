@@ -109,7 +109,7 @@ function OrganizationPage() {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
       <div>
-        <h1 className="text-3xl leading-tight [overflow-wrap:anywhere] sm:text-4xl">{org.name}</h1>
+        <h1 data-tour="members" className="text-3xl leading-tight [overflow-wrap:anywhere] sm:text-4xl">{org.name}</h1>
         <p className="mt-2 text-muted-foreground">You are {org.role === "owner" ? "an" : "a"} {ROLE_LABELS[org.role].toLowerCase()} of this organization.</p>
       </div>
 

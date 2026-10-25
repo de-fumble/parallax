@@ -89,7 +89,7 @@ export function ReportToolbar({ id, source, context, edited, canChange, onEdit, 
   const runAgain = { topic: source.topic, ...(context ? { context } : {}), mode: source.report.mode };
 
   return (
-    <div className="flex flex-wrap items-center gap-2 print:hidden">
+    <div data-tour="report-toolbar" className="flex flex-wrap items-center gap-2 print:hidden">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button size="sm" disabled={exporting !== null}>

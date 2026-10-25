@@ -82,7 +82,7 @@ function Shell() {
             <span>/</span>
             <span className="text-foreground">Collaboration</span>
           </div>
-          <nav aria-label="Collaboration sections" className="-mb-px mt-3 flex gap-1 overflow-x-auto">
+          <nav data-tour="org-tabs" aria-label="Collaboration sections" className="-mb-px mt-3 flex gap-1 overflow-x-auto">
             {tabs.filter((t) => !t.hidden).map((t) => {
               const active = t.exact ? pathname === t.to : pathname === t.to || pathname.startsWith(`${t.to}/`);
               return (

@@ -1,12 +1,13 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ChevronsUpDown, Clock, FileText, GitPullRequest, History, Home, Loader2, LogOut, Pause, Plus, Search, Users } from "lucide-react";
+import { Check, ChevronsUpDown, Clock, Compass, FileText, GitPullRequest, History, Home, Loader2, LogOut, Pause, Plus, Search, Users } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { reportListQuery } from "@/lib/reports.queries";
 import { isRunning, useResearchRun } from "@/lib/research-run";
 import { WorkspaceSwitcher } from "@/components/WorkspaceSwitcher";
+import { useTour } from "@/components/Tour";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +42,7 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
   const { org, orgId } = useWorkspace();
   const reports = useQuery({ ...reportListQuery(user?.id ?? "", orgId), enabled: !!user });
   const { setOpenMobile } = useSidebar();
+  const tour = useTour();
   // On a phone the sidebar is a drawer; close it once a destination is picked.
   const close = () => setOpenMobile(false);
 
@@ -49,7 +51,7 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
 
   return (
     <Sidebar collapsible="icon" className="app-sidebar">
-      <SidebarHeader>
+      <SidebarHeader data-tour="workspace">
         <WorkspaceSwitcher onNavigate={close} />
       </SidebarHeader>
 
@@ -69,14 +71,14 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
+              <SidebarMenuItem data-tour="search">
                 <SidebarMenuButton tooltip="Search" onClick={() => { close(); onSearch(); }}>
                   <Search />
                   <span>Search</span>
                   <kbd className="ml-auto hidden font-mono text-[10px] text-muted-foreground md:inline">⌘K</kbd>
                 </SidebarMenuButton>
               </SidebarMenuItem>
-              <SidebarMenuItem>
+              <SidebarMenuItem data-tour="history">
                 <SidebarMenuButton asChild tooltip="History" isActive={pathname === "/history"}>
                   <Link to="/history" onClick={close}>
                     <History />
@@ -88,7 +90,7 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
                 </SidebarMenuButton>
               </SidebarMenuItem>
               {org && (
-                <SidebarMenuItem>
+                <SidebarMenuItem data-tour="collab">
                   <SidebarMenuButton asChild tooltip="Collaboration" isActive={pathname === "/org" || pathname.startsWith("/org/")}>
                     <Link to="/org" onClick={close}>
                       <GitPullRequest />
@@ -186,6 +188,12 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
 
       <SidebarFooter>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Take the tour" onClick={() => { close(); tour.start(); }}>
+              <Compass />
+              <span>Take the tour</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

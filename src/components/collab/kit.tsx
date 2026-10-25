@@ -152,7 +152,7 @@ export function Panel({ title, action, children }: { title: ReactNode; action?: 
 
 export function PageTitle({ title, sub, actions }: { title: ReactNode; sub?: ReactNode; actions?: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-4">
+    <div data-page-title className="flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
         <h1 className="flex flex-wrap items-center gap-2 text-3xl leading-tight [overflow-wrap:anywhere] sm:text-4xl">{title}</h1>
         {sub && <p className="mt-1.5 text-sm text-muted-foreground">{sub}</p>}
