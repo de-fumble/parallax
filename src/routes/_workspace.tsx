@@ -7,8 +7,25 @@ import { CommandMenu } from "@/components/CommandMenu";
 import { OrgBranding } from "@/components/OrgBranding";
 import { TourProvider } from "@/components/Tour";
 import { WorkspaceSidebar } from "@/components/WorkspaceSidebar";
-import { Skeleton } from "@/components/ui/skeleton";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { MobileTabBar } from "@/components/MobileTabBar";
+import { AppSplash } from "@/components/Loading";
+import { SidebarInset, SidebarProvider, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+
+// On a phone: the workspace's initial, which opens the drawer with workspaces and account.
+function MobileDrawerButton() {
+  const { setOpenMobile } = useSidebar();
+  const { name } = useWorkspace();
+  return (
+    <button
+      type="button"
+      onClick={() => setOpenMobile(true)}
+      aria-label={`${name} — open menu`}
+      className="press flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary font-mono text-sm uppercase text-primary-foreground md:hidden"
+    >
+      {name.slice(0, 1)}
+    </button>
+  );
+}
 
 // The signed-in workspace: a sidebar, a top bar, and the page beside them.
 // A layout route — it adds no URL segment, so /research stays /research.
@@ -36,46 +53,39 @@ function Workspace() {
     if (!loading && !user) navigate({ to: "/auth", search: { redirect: pathname }, replace: true });
   }, [loading, user, navigate, pathname]);
 
-  if (!user) {
-    return (
-      <div className="flex min-h-screen items-center justify-center" aria-label="Loading workspace">
-        <div className="w-full max-w-md space-y-3 px-6">
-          <Skeleton className="h-8 w-40" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      </div>
-    );
-  }
+  if (!user) return <AppSplash />;
 
   return (
     <TourProvider>
       <SidebarProvider>
         <OrgBranding />
         <WorkspaceSidebar onSearch={() => setSearchOpen(true)} />
-        <SidebarInset className="min-w-0">
-          <header className="workspace-bar sticky top-0 z-30 flex h-14 items-center gap-2 border-b border-border bg-background/80 px-2 backdrop-blur-md sm:gap-3 sm:px-4">
-            <SidebarTrigger />
-            <span className="h-4 w-px bg-border" />
-            <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-sm">
-              <span className="hidden max-w-40 truncate text-muted-foreground sm:inline">{workspace.name}</span>
-              <span className="hidden text-muted-foreground sm:inline">/</span>
-              <span className="font-medium">{sectionName(pathname)}</span>
+        <SidebarInset className="min-w-0 pb-[var(--tabbar-h,0px)] md:pb-0">
+          <header className="workspace-bar sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-3 backdrop-blur-xl sm:px-4">
+            <MobileDrawerButton />
+            <SidebarTrigger className="hidden md:inline-flex" />
+            <span className="hidden h-4 w-px bg-border md:block" />
+            <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2 text-sm">
+              <span className="hidden max-w-40 truncate text-muted-foreground md:inline">{workspace.name}</span>
+              <span className="hidden text-muted-foreground md:inline">/</span>
+              <span className="truncate text-lg font-semibold tracking-tight md:text-sm md:font-medium">{sectionName(pathname)}</span>
             </nav>
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search reports"
-              className="ml-auto flex size-10 items-center justify-center gap-2 border border-border bg-card text-xs text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground sm:h-8 sm:w-auto sm:px-3"
+              className="ml-auto hidden h-8 items-center justify-center gap-2 border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground md:flex"
             >
-              <Search className="size-4 sm:size-3.5" />
-              <span className="hidden sm:inline">Search reports</span>
-              {/* A keyboard shortcut means nothing on a phone. */}
-              <kbd className="hidden font-mono text-[10px] sm:inline">⌘K</kbd>
+              <Search className="size-3.5" />
+              <span>Search reports</span>
+              <kbd className="font-mono text-[10px]">⌘K</kbd>
             </button>
           </header>
-          <Outlet />
+          <div key={pathname} className="page-enter">
+            <Outlet />
+          </div>
         </SidebarInset>
+        <MobileTabBar onSearch={() => setSearchOpen(true)} />
         <CommandMenu open={searchOpen} onOpenChange={setSearchOpen} />
       </SidebarProvider>
     </TourProvider>

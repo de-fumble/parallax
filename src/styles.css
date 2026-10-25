@@ -362,3 +362,180 @@ button,
 .bottom-safe {
   bottom: max(1rem, env(safe-area-inset-bottom));
 }
+
+/* ---------------------------------------------------------------------------
+ * App feel on phones
+ * ------------------------------------------------------------------------- */
+
+/* Pressable things sink a little under the finger. */
+.press {
+  transition: transform 140ms cubic-bezier(0.2, 0.8, 0.2, 1), color 150ms, background-color 150ms;
+}
+.press:active {
+  transform: scale(0.92);
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+@media (max-width: 767px) {
+  :root {
+    /* Height of the bottom tab bar, home indicator included. */
+    --tabbar-h: calc(3.5rem + env(safe-area-inset-bottom));
+  }
+
+  .tabbar {
+    height: var(--tabbar-h);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Action bars that pin to the bottom sit on top of the tab bar, not under it. */
+  .pb-safe.fixed {
+    bottom: var(--tabbar-h);
+    padding-bottom: 0.75rem;
+  }
+
+  /* Pages arrive with a short rise instead of snapping in. */
+  .page-enter {
+    animation: page-enter 280ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+
+  /* No rubber-band bounce revealing the page behind the app, and no text-selection on chrome. */
+  body {
+    overscroll-behavior-y: none;
+  }
+  .tabbar,
+  .workspace-bar {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Softer, rounder surfaces: cards, sheets and dialogs feel like an app, not a document. */
+  [data-slot="sheet-content"],
+  [role="dialog"]:not([aria-labelledby="tour-title"]) {
+    border-radius: 1.25rem;
+  }
+  [data-slot="sheet-content"][data-side="bottom"] {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* More room around content. */
+  main {
+    scroll-padding-bottom: var(--tabbar-h);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter {
+    animation: none;
+  }
+  .press:active {
+    transform: none;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Phone design: softer geometry, grouped surfaces, floating bars
+ * ------------------------------------------------------------------------- */
+
+@media (max-width: 767px) {
+  :root {
+    /* Every control, card and menu rounds off together. */
+    --radius: 1rem;
+    /* Floating tab bar: 4rem tall, 0.5rem off the bottom edge, plus a little air. */
+    --tabbar-h: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+
+  body {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Labels set in mono read as clutter at this size: one calm typeface instead. */
+  .font-mono:not(kbd):not(.cite-chip) {
+    font-family: var(--font-sans);
+    letter-spacing: 0.02em;
+  }
+
+  /* The tab bar floats as a frosted capsule. */
+  .tabbar {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: max(0.5rem, env(safe-area-inset-bottom));
+    height: 4rem;
+    padding: 0.25rem;
+    gap: 0.125rem;
+    border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    border-radius: 1.75rem;
+    background: color-mix(in oklch, var(--background) 72%, transparent);
+    -webkit-backdrop-filter: saturate(1.8) blur(24px);
+    backdrop-filter: saturate(1.8) blur(24px);
+    box-shadow: 0 10px 40px -10px rgb(0 0 0 / 0.25), 0 2px 8px rgb(0 0 0 / 0.06);
+  }
+
+  /* Bars that pin above it float too. */
+  .pb-safe.fixed {
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: calc(var(--tabbar-h) + 0.25rem);
+    padding: 0.75rem;
+    border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    border-radius: 1.25rem;
+    background: color-mix(in oklch, var(--background) 82%, transparent);
+    -webkit-backdrop-filter: saturate(1.8) blur(20px);
+    backdrop-filter: saturate(1.8) blur(20px);
+    box-shadow: 0 10px 30px -8px rgb(0 0 0 / 0.2);
+  }
+
+  /* Any boxed card becomes a soft grouped surface. */
+  [class~="bg-card"][class~="border"],
+  [class~="bg-card"][class~="border-border"] {
+    border-radius: 1.25rem;
+    overflow: hidden;
+    border-color: color-mix(in oklch, var(--border) 70%, transparent);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px -6px rgb(0 0 0 / 0.08);
+  }
+  [class~="border-dashed"] {
+    border-radius: 1.25rem;
+  }
+  /* Card headers: quiet captions, not rulers. */
+  section > header[class~="border-b"] {
+    padding-top: 0.875rem;
+    padding-bottom: 0.5rem;
+    border-bottom-color: transparent;
+    font-size: 0.75rem;
+  }
+
+  /* Native selects match the fields. */
+  select {
+    border-radius: 0.875rem;
+    min-height: 3rem;
+  }
+
+  /* Dialogs rise as sheets from the bottom edge. */
+  [role="dialog"][data-state="open"]:not([aria-labelledby="tour-title"]):not([data-side]) {
+    animation-duration: 260ms;
+  }
+
+  /* Toasts float as rounded capsules below the status bar. */
+  [data-sonner-toast] {
+    border-radius: 1.25rem !important;
+    box-shadow: 0 10px 30px -8px rgb(0 0 0 / 0.25) !important;
+  }
+
+  /* The landing page's floating call to action. */
+  .landing-cta {
+    position: fixed;
+    left: 1rem;
+    right: 1rem;
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    z-index: 30;
+    animation: page-enter 500ms 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+}

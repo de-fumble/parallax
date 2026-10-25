@@ -8,6 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
+import { ParallaxMark } from "@/components/ParallaxMark";
+
+function GoogleG() {
+  return (
+    <svg viewBox="0 0 24 24" className="!size-5" aria-hidden>
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1z" />
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z" />
+      <path fill="#FBBC05" d="M5.84 14.1a6.6 6.6 0 0 1 0-4.2V7.06H2.18a11 11 0 0 0 0 9.88l3.66-2.84z" />
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1A11 11 0 0 0 2.18 7.06l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z" />
+    </svg>
+  );
+}
 
 // Where to go after signing in: an invite link, or the page that asked for a
 // sign-in. Only paths inside this site are accepted.
@@ -50,6 +62,13 @@ function AuthPage() {
     if (user) navigate({ to: redirect ?? "/research" });
   }, [user, navigate, redirect]);
 
+  // Coming back from Google with the Back button restores this page as it was, spinner and all.
+  useEffect(() => {
+    const reset = (e: PageTransitionEvent) => { if (e.persisted) setGoogleBusy(false); };
+    window.addEventListener("pageshow", reset);
+    return () => window.removeEventListener("pageshow", reset);
+  }, []);
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
@@ -71,11 +90,13 @@ function AuthPage() {
   }
 
   return (
-      <main className="mx-auto max-w-sm px-5 py-10 sm:px-6 sm:py-16">
-        <h1 className="text-4xl">{mode === "in" ? "Welcome back" : "Create an account"}</h1>
+      <main className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-sm flex-col justify-center px-6 pb-12 pt-6 sm:py-16">
+        <ParallaxMark className="mx-auto mb-6 h-12 w-auto md:hidden" />
+        <h1 className="text-center text-4xl md:text-left">{mode === "in" ? "Welcome back" : "Create an account"}</h1>
         <Button
           variant="outline"
-          className="mt-8 w-full"
+          size="lg"
+          className="mt-8 w-full max-md:border-border max-md:bg-card max-md:shadow-md"
           disabled={googleBusy || busy}
           onClick={async () => {
             setGoogleBusy(true);
@@ -93,7 +114,7 @@ function AuthPage() {
             }
           }}
         >
-          {googleBusy && <Loader2 className="animate-spin" />}
+          {googleBusy ? <Loader2 className="animate-spin" /> : <GoogleG />}
           Continue with Google
         </Button>
         <div className="my-6 text-center font-mono text-xs uppercase text-muted-foreground">or</div>
@@ -104,7 +125,7 @@ function AuthPage() {
               <div className="grid grid-cols-2 gap-2">
                 {([["personal", "Personal account", "Just for me"], ["organization", "Organization", "For my team"]] as const).map(([id, title, hint]) => (
                   <button key={id} type="button" role="radio" aria-checked={kind === id} onClick={() => setKind(id)}
-                    className={`border px-3 py-2.5 text-left transition-colors ${kind === id ? "border-foreground bg-muted" : "border-border hover:bg-muted/50"}`}>
+                    className={`press rounded-2xl border px-3 py-3 text-left transition-colors md:rounded-none md:py-2.5 ${kind === id ? "border-foreground bg-muted" : "border-border hover:bg-muted/50"}`}>
                     <div className="text-sm font-medium">{title}</div>
                     <div className="text-xs text-muted-foreground">{hint}</div>
                   </button>
@@ -129,15 +150,15 @@ function AuthPage() {
             <Label htmlFor="pw">Password</Label>
             <Input id="pw" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-          <Button type="submit" className="w-full" disabled={busy || googleBusy}>
+          <Button type="submit" size="lg" className="w-full" disabled={busy || googleBusy}>
             {busy && <Loader2 className="animate-spin" />}
             {mode === "in" ? (busy ? "Signing in…" : "Sign in") : busy ? "Creating account…" : "Sign up"}
           </Button>
         </form>
-        <button className="mt-2 py-3 text-sm text-muted-foreground underline" onClick={() => setMode(mode === "in" ? "up" : "in")}>
+        <button className="mt-2 py-4 text-sm text-muted-foreground md:underline" onClick={() => setMode(mode === "in" ? "up" : "in")}>
           {mode === "in" ? "No account? Sign up" : "Have an account? Sign in"}
         </button>
-        <p className="mt-6 text-xs text-muted-foreground">
+        <p className="mt-4 text-center text-xs text-muted-foreground md:text-left">
           By continuing you agree to our <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link> and{" "}
           <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
         </p>

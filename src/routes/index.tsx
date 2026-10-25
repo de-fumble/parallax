@@ -184,13 +184,13 @@ function Landing() {
               every gap is named. So you can check the answer, not just trust it.
             </p>
             <div className="rise-in mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center" style={{ "--i": 3 } as React.CSSProperties}>
-              <Button asChild size="lg" className="group h-12 px-7 text-base">
+              <Button asChild size="lg" className="group md:h-12 md:px-7">
                 <Link to="/research">
                   Start researching
                   <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
                 </Link>
               </Button>
-              <Button asChild variant="ghost" size="lg" className="h-12 px-5 text-base">
+              <Button asChild variant="ghost" size="lg" className="md:h-12 md:px-5">
                 <a href="#how-it-works">How it works</a>
               </Button>
             </div>
@@ -207,9 +207,9 @@ function Landing() {
           <Eyebrow>The standard</Eyebrow>
           <h2 className="mt-4 text-4xl leading-tight md:text-5xl">An answer is only as good as what stands behind it.</h2>
         </div>
-        <div className="mt-14 grid border-l border-t border-border md:grid-cols-3">
+        <div className="mt-10 grid gap-3 md:mt-14 md:grid-cols-3 md:gap-0 md:border-l md:border-t md:border-border">
           {PRINCIPLES.map((p, i) => (
-            <div key={p.title} className="reveal border-b border-r border-border p-6 sm:p-8 transition-colors duration-300 hover:bg-muted/60">
+            <div key={p.title} className="reveal border-border p-6 transition-colors duration-300 hover:bg-muted/60 max-md:rounded-3xl max-md:border max-md:bg-card sm:p-8 md:border-b md:border-r">
               <div className="font-mono text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</div>
               <h3 className="mt-6 text-3xl">{p.title}</h3>
               <p className="mt-3 leading-relaxed text-muted-foreground">{p.body}</p>
@@ -242,18 +242,18 @@ function Landing() {
             <Eyebrow inverse>How it works</Eyebrow>
             <h2 className="mt-4 text-4xl leading-tight md:text-5xl">From question to cited report in three steps.</h2>
           </div>
-          <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
+          <ol className="mt-10 grid gap-3 md:mt-14 md:grid-cols-3 md:gap-8">
             {STEPS.map((s, i) => (
-              <li key={s.title} className="reveal border-t border-background/25 pt-6">
+              <li key={s.title} className="reveal border-background/25 max-md:rounded-3xl max-md:bg-background/10 max-md:p-6 md:border-t md:pt-6">
                 <div className="font-mono text-xs text-background/60">{String(i + 1).padStart(2, "0")}</div>
                 <h3 className="mt-4 text-3xl">{s.title}</h3>
                 <p className="mt-3 leading-relaxed text-background/70">{s.body}</p>
               </li>
             ))}
           </ol>
-          <div className="reveal mt-16 grid gap-px border border-background/25 bg-background/25 md:grid-cols-3">
+          <div className="reveal mt-10 grid gap-3 md:mt-16 md:gap-px md:border md:border-background/25 md:bg-background/25 md:grid-cols-3">
             {DEPTHS.map((d) => (
-              <div key={d.name} className="bg-foreground p-6">
+              <div key={d.name} className="bg-foreground p-6 max-md:rounded-3xl max-md:border max-md:border-background/25">
                 <div className="font-mono text-xs uppercase tracking-widest text-background/60">Depth</div>
                 <div className="mt-2 font-serif text-2xl">{d.name}</div>
                 <p className="mt-1 text-sm text-background/70">{d.body}</p>
@@ -269,9 +269,9 @@ function Landing() {
           <Eyebrow>Inside every report</Eyebrow>
           <h2 className="mt-4 text-4xl leading-tight md:text-5xl">More than a summary.</h2>
         </div>
-        <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-3 sm:grid-cols-2 md:mt-14 md:gap-x-10 md:gap-y-12 lg:grid-cols-3">
           {ANATOMY.map((a) => (
-            <div key={a.title} className="reveal border-t border-foreground pt-5">
+            <div key={a.title} className="reveal max-md:rounded-3xl max-md:border max-md:border-border max-md:bg-card max-md:p-6 md:border-t md:border-foreground md:pt-5">
               <h3 className="text-2xl">{a.title}</h3>
               <p className="mt-2 leading-relaxed text-muted-foreground">{a.body}</p>
             </div>
@@ -288,7 +288,7 @@ function Landing() {
             <br />
             <em className="text-muted-foreground">See the evidence.</em>
           </h2>
-          <Button asChild size="lg" className="group mt-10 h-12 px-7 text-base">
+          <Button asChild size="lg" className="group mt-10 md:h-12 md:px-7">
             <Link to="/research">
               Start researching
               <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -297,7 +297,17 @@ function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-border">
+      {/* On a phone the way in is always one thumb away. */}
+      <div className="landing-cta md:hidden">
+        <Button asChild size="lg" className="group w-full shadow-xl shadow-black/20">
+          <Link to="/research">
+            Start researching
+            <ArrowRight className="transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
+        </Button>
+      </div>
+
+      <footer className="border-t border-border pb-24 md:pb-0">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-6 sm:px-6 sm:py-8 text-sm text-muted-foreground">
           <div className="flex items-center gap-2.5 text-foreground">
             <ParallaxMark className="h-5 w-auto" />

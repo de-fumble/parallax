@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Plus, Search, Trash2 } from "lucide-react";
+import { FileText, Plus, Search, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
@@ -75,29 +75,29 @@ function History() {
   }, [rows, text, depth]);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-10">
+    <div className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-10">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl leading-tight sm:text-4xl">History</h1>
-          <p className="mt-2 text-muted-foreground">
+          <h1 className="hidden text-3xl leading-tight sm:text-4xl md:block">History</h1>
+          <p className="text-sm text-muted-foreground md:mt-2 md:text-base">
             {rows ? `${rows.length} ${rows.length === 1 ? "report" : "reports"} in ${org ? org.name : "your personal workspace"}` : "Saved reports"}
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="hidden md:inline-flex">
           <Link to="/research"><Plus /> New research</Link>
         </Button>
       </div>
 
       {rows && rows.length > 0 && (
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        <div className="mt-4 space-y-3 md:mt-8 md:flex md:flex-wrap md:items-center md:gap-3 md:space-y-0">
           <div className="relative min-w-56 flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="Filter by title or topic…" className="pl-9" aria-label="Filter reports" />
+            <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground md:left-3" />
+            <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="Search" className="pl-10 max-md:rounded-2xl md:pl-9" aria-label="Filter reports" />
           </div>
-          <div role="radiogroup" aria-label="Depth" className="flex border border-border">
+          <div role="radiogroup" aria-label="Depth" className="flex rounded-full bg-muted/70 p-1 md:rounded-none md:border md:border-border md:bg-transparent md:p-0">
             {DEPTHS.map((d) => (
               <button key={d} type="button" role="radio" aria-checked={depth === d} onClick={() => setDepth(d)}
-                className={`px-3 py-3 font-mono text-[10px] uppercase tracking-wider transition-colors sm:py-2 ${depth === d ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>
+                className={`flex-1 rounded-full px-3 py-2 font-mono text-[11px] uppercase tracking-wider transition-all duration-200 md:flex-none md:rounded-none md:py-2 md:text-[10px] ${depth === d ? "bg-background text-foreground shadow-sm md:bg-foreground md:text-background md:shadow-none" : "text-muted-foreground hover:text-foreground"}`}>
                 {d === "ALL" ? "All" : d}
               </button>
             ))}
@@ -106,11 +106,14 @@ function History() {
       )}
 
       {list.isPending && (
-        <ul className="mt-6 divide-y divide-border border-y border-border" aria-label="Loading reports">
-          {[0, 1, 2, 3].map((i) => (
-            <li key={i} className="space-y-2 py-4">
-              <Skeleton className="h-6" style={{ width: `${70 - i * 9}%` }} />
-              <Skeleton className="h-3 w-56" />
+        <ul className="mt-5 divide-y divide-border overflow-hidden rounded-2xl bg-card md:rounded-none md:border-y md:border-border md:bg-transparent" aria-label="Loading reports">
+          {[0, 1, 2, 3, 4].map((i) => (
+            <li key={i} className="flex items-center gap-3 p-4 md:px-0">
+              <Skeleton className="size-11 shrink-0 rounded-xl md:hidden" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-5" style={{ width: `${80 - i * 9}%` }} />
+                <Skeleton className="h-3 w-40" />
+              </div>
             </li>
           ))}
         </ul>
@@ -141,28 +144,33 @@ function History() {
       )}
 
       {visible && visible.length > 0 && (
-        <ul className="mt-6 divide-y divide-border border-y border-border animate-in fade-in duration-300">
+        <ul className="mt-5 divide-y divide-border/60 overflow-hidden rounded-2xl bg-card shadow-sm animate-in fade-in duration-300 md:mt-6 md:divide-border md:rounded-none md:border-y md:border-border md:bg-transparent md:shadow-none">
           {visible.map((r) => (
-            <li key={r.id} className="group flex items-center justify-between gap-4 py-4">
+            <li key={r.id} className="group flex items-center gap-1 pr-2 md:gap-4 md:py-4 md:pr-0">
               <Link
                 to="/reports/$id"
                 params={{ id: r.id }}
-                className="min-w-0 flex-1"
+                className="press flex min-w-0 flex-1 items-center gap-3 px-4 py-3.5 active:bg-muted/60 md:block md:px-0 md:py-0 md:active:bg-transparent"
                 onMouseEnter={() => queryClient.prefetchQuery(reportQuery(r.id))}
                 onFocus={() => queryClient.prefetchQuery(reportQuery(r.id))}
               >
-                {/* Two lines of title on a phone, where one line shows too little of it. */}
-                <div className="line-clamp-2 font-serif text-xl leading-snug decoration-1 underline-offset-4 group-hover:underline sm:line-clamp-1">{r.title || r.topic}</div>
-                <div className="mt-1 font-mono text-xs text-muted-foreground">
-                  <span className="sm:hidden">{new Date(r.created_at).toLocaleDateString()}</span>
-                  <span className="hidden sm:inline">{new Date(r.created_at).toLocaleString()}</span>
-                  {" · "}{r.mode}
-                  {org && ` · ${authorOf(r.user_id)}`}
-                  <span className="hidden sm:inline">
-                    {r.status && ` · ${r.status.replace("_", " ")}`}
-                    {r.confidence && ` · ${r.confidence} confidence`}
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground md:hidden">
+                  <FileText className="size-5" strokeWidth={1.75} />
+                </span>
+                <span className="block min-w-0 flex-1">
+                  {/* Two lines of title on a phone, where one line shows too little of it. */}
+                  <span className="line-clamp-2 block text-[17px] font-medium leading-snug tracking-tight md:font-serif md:text-xl md:font-normal md:decoration-1 md:underline-offset-4 md:group-hover:underline md:line-clamp-1">{r.title || r.topic}</span>
+                  <span className="mt-0.5 block truncate text-[13px] text-muted-foreground md:mt-1 md:font-mono md:text-xs">
+                    <span className="md:hidden">{new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+                    <span className="hidden md:inline">{new Date(r.created_at).toLocaleString()}</span>
+                    {" · "}<span className="capitalize md:normal-case">{r.mode.toLowerCase()}</span>
+                    {org && ` · ${authorOf(r.user_id)}`}
+                    <span className="hidden md:inline">
+                      {r.status && ` · ${r.status.replace("_", " ")}`}
+                      {r.confidence && ` · ${r.confidence} confidence`}
+                    </span>
                   </span>
-                </div>
+                </span>
               </Link>
               {!canDelete(r.user_id) ? null : confirming === r.id ? (
                 <div className="flex shrink-0 items-center gap-1 animate-in fade-in slide-in-from-right-1 duration-200">
@@ -170,9 +178,9 @@ function History() {
                   <Button variant="ghost" size="sm" onClick={() => setConfirming(null)}>Cancel</Button>
                 </div>
               ) : (
-                <Button variant="ghost" size="sm" className="shrink-0 text-muted-foreground" aria-label={`Delete ${r.title || r.topic}`} onClick={() => setConfirming(r.id)}>
-                  <Trash2 className="sm:hidden" />
-                  <span className="hidden sm:inline">Delete</span>
+                <Button variant="ghost" size="sm" className="shrink-0 text-muted-foreground max-md:size-10 max-md:px-0" aria-label={`Delete ${r.title || r.topic}`} onClick={() => setConfirming(r.id)}>
+                  <Trash2 className="md:hidden" />
+                  <span className="hidden md:inline">Delete</span>
                 </Button>
               )}
             </li>
