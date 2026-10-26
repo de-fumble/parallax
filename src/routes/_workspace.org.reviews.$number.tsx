@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AtSign, CheckCircle2, CircleDashed, Clock, FileText, GitBranch, Link2, MessageSquare, Paperclip, Smile, X, XCircle } from "lucide-react";
+import { AtSign, CheckCircle2, CircleDashed, Clock, Download, FileText, GitBranch, Link2, Loader2, MessageSquare, Paperclip, Smile, X, XCircle } from "lucide-react";
 import {
   acceptSuggestion,
   addComment,
@@ -24,6 +24,9 @@ import {
   type Reaction,
 } from "@/lib/collab/db";
 import { canDecide, pendingStage, STAGE_NAMES } from "@/lib/collab/rules";
+import { exportFiledDocument } from "@/lib/report-export";
+import { printLogoFor } from "@/lib/branding";
+import { useOrgBranding } from "@/components/OrgBranding";
 import { Avatar, LabelChip, Panel, StatusPill, UrgencyChip, selectClass, timeAgo, useAction, useCollab, usePeople, waited } from "@/components/collab/kit";
 import { SectionDiffView } from "@/components/collab/SectionDiff";
 import { Button } from "@/components/ui/button";
@@ -400,12 +403,46 @@ function DecisionBox({ data }: { data: ReviewData }) {
   const { role, me, members } = useCollab();
   const act = useAction();
   const person = usePeople();
+  const branding = useOrgBranding();
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
   const r = data.review;
   const stage = pendingStage(data.approvals);
   const allowed = canDecide(r, data.approvals, role, me, members);
   const isAuthor = r.author_id === me;
+
+  async function handleDownloadFiledPdf() {
+    setDownloadingPdf(true);
+    try {
+      const logo = await printLogoFor(branding)?.catch(() => null);
+      const authorName = r.author_id ? person(r.author_id).name : "Unknown";
+      const meta = [
+        `Version ${r.filed_version ?? 1}`,
+        r.kind,
+        `By ${authorName}`,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
+      await exportFiledDocument(
+        {
+          title: r.title,
+          kind: r.kind,
+          topic: `${r.kind} · Review #${r.number}`,
+          meta,
+          sections: data.after,
+        },
+        "pdf",
+        logo ?? null,
+      );
+      toast.success(`Downloaded ${r.title} (v${r.filed_version}) as PDF`);
+    } catch (err) {
+      toast.error("Failed to download PDF", { description: err instanceof Error ? err.message : undefined });
+    } finally {
+      setDownloadingPdf(false);
+    }
+  }
 
   const run = async (decision: "approve" | "request_changes" | "reject") => {
     if (decision !== "approve" && !note.trim()) {
@@ -475,7 +512,19 @@ function DecisionBox({ data }: { data: ReviewData }) {
         <p className="p-4 text-sm text-muted-foreground">You can comment on any section. Approving needs the {stage ? STAGE_NAMES[stage.stage] : "reviewer"} role.</p>
       )}
       {r.status === "filed" && (
-        <div className="p-4"><Button asChild variant="outline"><Link to="/org/documents/$documentId" params={{ documentId: r.document_id }}>Open in the library</Link></Button></div>
+        <div className="flex flex-wrap items-center gap-2 p-4">
+          <Button asChild variant="outline">
+            <Link to="/org/documents/$documentId" params={{ documentId: r.document_id }}>Open in the library</Link>
+          </Button>
+          <Button
+            variant="outline"
+            disabled={downloadingPdf}
+            onClick={() => void handleDownloadFiledPdf()}
+          >
+            {downloadingPdf ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+            <span>Download PDF {r.filed_version ? `(v${r.filed_version})` : ""}</span>
+          </Button>
+        </div>
       )}
     </section>
   );

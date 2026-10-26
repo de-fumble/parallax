@@ -1,9 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { GitBranch, Users } from "lucide-react";
+import { toast } from "sonner";
+import { Download, GitBranch, Loader2, Users } from "lucide-react";
 import { isManager } from "@/lib/organizations";
-import { documentQuery, projectsQuery, reviewsQuery, setSectionOwners, startDraft } from "@/lib/collab/db";
+import { documentQuery, projectsQuery, reviewsQuery, setSectionOwners, startDraft, type DocumentVersion } from "@/lib/collab/db";
+import { exportFiledDocument } from "@/lib/report-export";
+import { printLogoFor } from "@/lib/branding";
+import { useOrgBranding } from "@/components/OrgBranding";
 import { Avatar, Panel, PageTitle, timeAgo, useAction, useCollab, usePeople } from "@/components/collab/kit";
 import { SectionDiffView } from "@/components/collab/SectionDiff";
 import { Button } from "@/components/ui/button";
@@ -19,6 +23,7 @@ export const Route = createFileRoute("/_workspace/org/documents/$documentId")({
 function DocumentPage() {
   const { documentId } = Route.useParams();
   const { orgId, role, me } = useCollab();
+  const branding = useOrgBranding();
   const person = usePeople();
   const act = useAction();
   const navigate = useNavigate();
@@ -27,6 +32,7 @@ function DocumentPage() {
   const reviews = useQuery(reviewsQuery(orgId));
   const [compare, setCompare] = useState<number | null>(null);
   const [owning, setOwning] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState<string | null>(null);
 
   if (query.isPending) return <Skeleton className="h-64" />;
   if (query.isError) return <p className="border border-weak/40 bg-weak/5 p-4 text-sm">{query.error.message}</p>;
@@ -39,20 +45,75 @@ function DocumentPage() {
   const shown = compare ? versions.find((v) => v.version === compare) : null;
   const previous = shown ? versions.find((v) => v.version === shown.version - 1) : null;
 
+  async function downloadPdf(v?: DocumentVersion) {
+    const target = v ?? shown ?? current;
+    if (!doc || !target) return;
+    const tag = `v${target.version}`;
+    setDownloading(tag);
+    try {
+      const logo = await printLogoFor(branding)?.catch(() => null);
+      const author = target.filed_by ? person(target.filed_by).name : "Unknown";
+      const filedDate = target.filed_at
+        ? new Date(target.filed_at).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
+        : "";
+      const meta = [
+        `Version ${target.version}`,
+        doc.kind,
+        project ? project.name : null,
+        filedDate ? `Filed ${filedDate}` : null,
+        `By ${author}`,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
+      await exportFiledDocument(
+        {
+          title: doc.title,
+          kind: doc.kind,
+          topic: project ? `${doc.kind} · Project: ${project.name}` : `${doc.kind} · Organization Library`,
+          meta,
+          sections: target.sections,
+        },
+        "pdf",
+        logo ?? null,
+      );
+      toast.success(`Downloaded ${doc.title} (v${target.version}) as PDF`);
+    } catch (err) {
+      toast.error("Failed to download PDF", { description: err instanceof Error ? err.message : undefined });
+    } finally {
+      setDownloading(null);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <PageTitle
         title={<>{doc.title} <span className="rounded-full border border-foreground px-2 font-mono text-xs">v{doc.current_version}</span></>}
         sub={<>{doc.kind} · {project && <Link to="/org/projects/$projectId" params={{ projectId: project.id }} className="underline">{project.name}</Link>} · filed {timeAgo(doc.filed_at)}</>}
         actions={
-          <Button
-            onClick={async () => {
-              const id = await act(() => startDraft({ project: doc.project_id, document: doc.id, title: doc.title, kind: doc.kind, sections: null }), "Draft started");
-              if (id) navigate({ to: "/org/drafts/$draftId", params: { draftId: id } });
-            }}
-          >
-            <GitBranch /> Start a draft
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="outline"
+              disabled={!!downloading}
+              onClick={() => void downloadPdf()}
+              title="Download this version as PDF"
+            >
+              {downloading === (shown ? `v${shown.version}` : `v${doc.current_version}`) ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Download className="size-4" />
+              )}
+              <span>Download PDF {shown ? `(v${shown.version})` : `(v${doc.current_version})`}</span>
+            </Button>
+            <Button
+              onClick={async () => {
+                const id = await act(() => startDraft({ project: doc.project_id, document: doc.id, title: doc.title, kind: doc.kind, sections: null }), "Draft started");
+                if (id) navigate({ to: "/org/drafts/$draftId", params: { draftId: id } });
+              }}
+            >
+              <GitBranch /> Start a draft
+            </Button>
+          </div>
         }
       />
 
@@ -102,7 +163,23 @@ function DocumentPage() {
                         {review && <> from <Link to="/org/reviews/$number" params={{ number: String(review.number) }} className="underline">#{review.number}</Link></>}
                       </div>
                     </div>
-                    <button type="button" className="shrink-0 text-xs underline" onClick={() => setCompare(v.version)}>Changes</button>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <button
+                        type="button"
+                        className="inline-flex items-center gap-1 text-xs text-muted-foreground underline hover:text-foreground disabled:opacity-50"
+                        title={`Download v${v.version} as PDF`}
+                        disabled={downloading === `v${v.version}`}
+                        onClick={() => void downloadPdf(v)}
+                      >
+                        {downloading === `v${v.version}` ? (
+                          <Loader2 className="size-3 animate-spin" />
+                        ) : (
+                          <Download className="size-3" />
+                        )}
+                        <span>PDF</span>
+                      </button>
+                      <button type="button" className="text-xs underline" onClick={() => setCompare(v.version)}>Changes</button>
+                    </div>
                   </li>
                 );
               })}

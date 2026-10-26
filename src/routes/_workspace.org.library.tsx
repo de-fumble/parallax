@@ -1,9 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search } from "lucide-react";
+import { toast } from "sonner";
+import { Download, Loader2, Search } from "lucide-react";
 import { DOCUMENT_KINDS, libraryQuery, projectsQuery } from "@/lib/collab/db";
+import { exportFiledDocument } from "@/lib/report-export";
+import { printLogoFor } from "@/lib/branding";
+import { useOrgBranding } from "@/components/OrgBranding";
 import { Empty, LoadError, PageTitle, selectClass, timeAgo, useCollab, usePeople } from "@/components/collab/kit";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -22,6 +27,7 @@ const PERIODS = [
 // at their current version. Search covers the full text.
 function Library() {
   const { orgId, members } = useCollab();
+  const branding = useOrgBranding();
   const person = usePeople();
   const [q, setQ] = useState("");
   const [term, setTerm] = useState("");
@@ -29,6 +35,7 @@ function Library() {
   const [author, setAuthor] = useState("all");
   const [kind, setKind] = useState("all");
   const [period, setPeriod] = useState("any");
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   // Search after a pause in typing, not on every key.
   useEffect(() => {
     const t = setTimeout(() => setTerm(q), 300);
@@ -44,6 +51,47 @@ function Library() {
       (kind === "all" || d.kind === kind) &&
       (!days || Date.parse(d.filed_at) > Date.now() - days * 86_400_000),
   );
+
+  async function downloadPdf(e: React.MouseEvent, d: (typeof shown)[number]) {
+    e.preventDefault();
+    e.stopPropagation();
+    setDownloadingId(d.id);
+    try {
+      const logo = await printLogoFor(branding)?.catch(() => null);
+      const proj = projects.data?.find((p) => p.id === d.project_id);
+      const authorName = d.filed_by ? person(d.filed_by).name : "Unknown";
+      const filedDate = d.filed_at
+        ? new Date(d.filed_at).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
+        : "";
+      const meta = [
+        `Version ${d.current_version}`,
+        d.kind,
+        proj ? proj.name : null,
+        filedDate ? `Filed ${filedDate}` : null,
+        `By ${authorName}`,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
+      await exportFiledDocument(
+        {
+          title: d.title,
+          kind: d.kind,
+          topic: proj ? `${d.kind} · Project: ${proj.name}` : `${d.kind} · Organization Library`,
+          meta,
+          sections: d.sections,
+        },
+        "pdf",
+        logo ?? null,
+      );
+      toast.success(`Downloaded ${d.title} (v${d.current_version}) as PDF`);
+    } catch (err) {
+      toast.error("Failed to download PDF", { description: err instanceof Error ? err.message : undefined });
+    } finally {
+      setDownloadingId(null);
+    }
+  }
+
 
   return (
     <div className="space-y-5">
@@ -84,15 +132,52 @@ function Library() {
             const summary = d.sections.find((s) => s.body.trim())?.body ?? "";
             return (
               <li key={d.id}>
-                <Link to="/org/documents/$documentId" params={{ documentId: d.id }} className="flex h-full flex-col border border-border bg-card p-4 transition-colors hover:border-foreground/40">
+                <div className="flex h-full flex-col border border-border bg-card p-4 transition-colors hover:border-foreground/40">
                   <div className="flex items-start justify-between gap-2">
-                    <span className="font-serif text-xl leading-snug">{d.title}</span>
-                    <span className="shrink-0 rounded-full border border-foreground px-2 font-mono text-[10px]">v{d.current_version}</span>
+                    <Link
+                      to="/org/documents/$documentId"
+                      params={{ documentId: d.id }}
+                      className="font-serif text-xl leading-snug hover:underline"
+                    >
+                      {d.title}
+                    </Link>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="rounded-full border border-foreground px-2 font-mono text-[10px]">v{d.current_version}</span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-7 px-2.5 text-xs gap-1.5 border-border hover:border-foreground"
+                        disabled={downloadingId === d.id}
+                        onClick={(e) => void downloadPdf(e, d)}
+                        title={`Download ${d.title} as PDF`}
+                      >
+                        {downloadingId === d.id ? <Loader2 className="size-3 animate-spin" /> : <Download className="size-3" />}
+                        <span>PDF</span>
+                      </Button>
+                    </div>
                   </div>
                   <div className="mt-1 text-xs text-muted-foreground">{d.kind} · {projects.data?.find((p) => p.id === d.project_id)?.name}</div>
-                  {summary && <p className="mt-3 line-clamp-3 text-sm text-muted-foreground">{summary}</p>}
-                  <div className="mt-auto pt-3 text-xs text-muted-foreground">Filed {timeAgo(d.filed_at)} by {person(d.filed_by).name}</div>
-                </Link>
+                  {summary && (
+                    <Link
+                      to="/org/documents/$documentId"
+                      params={{ documentId: d.id }}
+                      className="mt-3 line-clamp-3 text-sm text-muted-foreground hover:text-foreground"
+                    >
+                      {summary}
+                    </Link>
+                  )}
+                  <div className="mt-auto pt-3 flex items-center justify-between text-xs text-muted-foreground">
+                    <span>Filed {timeAgo(d.filed_at)} by {person(d.filed_by).name}</span>
+                    <Link
+                      to="/org/documents/$documentId"
+                      params={{ documentId: d.id }}
+                      className="underline text-[11px] text-muted-foreground hover:text-foreground"
+                    >
+                      View document →
+                    </Link>
+                  </div>
+                </div>
               </li>
             );
           })}

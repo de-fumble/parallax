@@ -6,7 +6,7 @@ import { markSvg, type PrintLogo } from "./branding";
 // Markdown versions always carry the same content in the same order.
 
 type Block =
-  | { type: "paragraph"; text: string; tone?: "lead" | "muted" }
+  | { type: "paragraph"; text: string; tone?: "lead" | "muted" | undefined }
   | { type: "subheading"; text: string }
   | { type: "list"; ordered: boolean; items: string[] };
 
@@ -313,9 +313,111 @@ function fileName(title: string, extension: string) {
   return `parallax-${slug || "report"}.${extension}`;
 }
 
-/** `logo` is the organization's print logo, already in its colours; null prints the Parallax mark (PDF) or none (Word). */
-export async function exportReport(source: ExportSource, format: ExportFormat, logo: PrintLogo | null = null) {
-  const doc = buildExportDoc(source);
+export function parseSectionBodyToBlocks(body: string, isLead = false): Block[] {
+  const blocks: Block[] = [];
+  const paragraphs = body.split(/\n{2,}/).map((p) => p.trim()).filter(Boolean);
+
+  let firstPara = true;
+  for (const para of paragraphs) {
+    const rawLines = para.split("\n").map((l) => l.trim()).filter(Boolean);
+    let currentList: { ordered: boolean; items: string[] } | null = null;
+    let currentParaLines: string[] = [];
+
+    const flushList = () => {
+      if (currentList && currentList.items.length > 0) {
+        blocks.push({ type: "list", ordered: currentList.ordered, items: [...currentList.items] });
+        currentList = null;
+      }
+    };
+
+    const flushPara = () => {
+      if (currentParaLines.length > 0) {
+        const text = currentParaLines.join(" ");
+        const isMuted = text.startsWith("_") && text.endsWith("_");
+        const clean = isMuted ? text.slice(1, -1) : text;
+        blocks.push({
+          type: "paragraph",
+          text: clean,
+          tone: firstPara && isLead ? "lead" : isMuted ? "muted" : undefined,
+        });
+        firstPara = false;
+        currentParaLines = [];
+      }
+    };
+
+    for (const line of rawLines) {
+      if (/^#{1,4}\s+/.test(line)) {
+        flushList();
+        flushPara();
+        blocks.push({ type: "subheading", text: line.replace(/^#{1,4}\s+/, "") });
+      } else if (/^[-*•]\s+/.test(line)) {
+        flushPara();
+        const item = line.replace(/^[-*•]\s+/, "");
+        if (currentList && !currentList.ordered) {
+          currentList.items.push(item);
+        } else {
+          flushList();
+          currentList = { ordered: false, items: [item] };
+        }
+      } else if (/^\d+[.)]\s+/.test(line)) {
+        flushPara();
+        const item = line.replace(/^\d+[.)]\s+/, "");
+        if (currentList && currentList.ordered) {
+          currentList.items.push(item);
+        } else {
+          flushList();
+          currentList = { ordered: true, items: [item] };
+        }
+      } else {
+        flushList();
+        currentParaLines.push(line);
+      }
+    }
+
+    flushList();
+    flushPara();
+  }
+
+  return blocks;
+}
+
+export function buildExportDocFromSections(params: {
+  title: string;
+  kind?: string | undefined;
+  topic?: string | undefined;
+  meta: string;
+  sections: { title: string; body: string }[];
+}): ExportDoc {
+  const exportSections: Section[] = [];
+  for (const s of params.sections) {
+    const isLead = /^(summary|bottom line|executive summary)/i.test(s.title);
+    const blocks = parseSectionBodyToBlocks(s.body, isLead);
+    if (blocks.length > 0) {
+      exportSections.push({ heading: s.title, blocks });
+    }
+  }
+
+  if (exportSections.length === 0) {
+    exportSections.push({
+      heading: "Overview",
+      blocks: [{ type: "paragraph", text: "No content available." }],
+    });
+  }
+
+  return {
+    title: params.title,
+    topic: params.topic || (params.kind ? `${params.kind} · Organization Library` : "Filed Organization Document"),
+    meta: params.meta,
+    sections: exportSections,
+  };
+}
+
+export async function exportDoc(
+  doc: ExportDoc,
+  format: ExportFormat,
+  logo: PrintLogo | null = null,
+  rawJsonFallback?: unknown,
+) {
   const blob =
     format === "pdf"
       ? await toPdf(doc, logo)
@@ -323,7 +425,7 @@ export async function exportReport(source: ExportSource, format: ExportFormat, l
         ? await toDocx(doc, logo)
         : format === "md"
           ? new Blob([toMarkdown(doc)], { type: "text/markdown" })
-          : new Blob([JSON.stringify(source.report, null, 2)], { type: "application/json" });
+          : new Blob([JSON.stringify(rawJsonFallback ?? doc, null, 2)], { type: "application/json" });
 
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
@@ -334,4 +436,25 @@ export async function exportReport(source: ExportSource, format: ExportFormat, l
   link.remove();
   // Give the browser a moment to start the download before releasing the blob.
   setTimeout(() => URL.revokeObjectURL(url), 10_000);
+}
+
+/** `logo` is the organization's print logo, already in its colours; null prints the Parallax mark (PDF) or none (Word). */
+export async function exportReport(source: ExportSource, format: ExportFormat, logo: PrintLogo | null = null) {
+  const doc = buildExportDoc(source);
+  return exportDoc(doc, format, logo, source.report);
+}
+
+export async function exportFiledDocument(
+  params: {
+    title: string;
+    kind?: string | undefined;
+    topic?: string | undefined;
+    meta: string;
+    sections: { title: string; body: string }[];
+  },
+  format: ExportFormat = "pdf",
+  logo: PrintLogo | null = null,
+) {
+  const doc = buildExportDocFromSections(params);
+  return exportDoc(doc, format, logo);
 }

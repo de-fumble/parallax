@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowUp, Archive, ArchiveRestore, GitBranch, Plus, Save, Send, Sparkles, X } from "lucide-react";
+import { toast } from "sonner";
+import { ArrowDown, ArrowUp, Archive, ArchiveRestore, Download, GitBranch, Loader2, Plus, Save, Send, Sparkles, X } from "lucide-react";
 import {
   closeDraft,
   decideCloseRequest,
@@ -21,6 +22,9 @@ import { isManager, ROLE_LABELS } from "@/lib/organizations";
 import { canCloseDraft } from "@/lib/collab/rules";
 import { reportQuery } from "@/lib/reports.queries";
 import { reportToSections } from "@/lib/collab/templates";
+import { exportFiledDocument } from "@/lib/report-export";
+import { printLogoFor } from "@/lib/branding";
+import { useOrgBranding } from "@/components/OrgBranding";
 import { useResearchActions, useResearchRun } from "@/lib/research-run";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { countChanges } from "@/lib/collab/diff";
@@ -109,6 +113,43 @@ function DraftPage() {
     if (ok !== undefined) setMessage("");
   }
 
+  const branding = useOrgBranding();
+  const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  async function handleDownloadFiledDraftPdf() {
+    if (!data) return;
+    setDownloadingPdf(true);
+    try {
+      const logo = await printLogoFor(branding)?.catch(() => null);
+      const authorName = data.draft.author_id ? person(data.draft.author_id).name : "Unknown";
+      const kind = doc?.kind ?? "Report";
+      const meta = [
+        kind,
+        project ? project.name : null,
+        `By ${authorName}`,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
+      await exportFiledDocument(
+        {
+          title: data.draft.title,
+          kind,
+          topic: project ? `${kind} · Project: ${project.name}` : `${kind} · Organization Library`,
+          meta,
+          sections: data.draft.sections,
+        },
+        "pdf",
+        logo ?? null,
+      );
+      toast.success(`Downloaded ${data.draft.title} as PDF`);
+    } catch (err) {
+      toast.error("Failed to download PDF", { description: err instanceof Error ? err.message : undefined });
+    } finally {
+      setDownloadingPdf(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
       <PageTitle
@@ -131,7 +172,27 @@ function DraftPage() {
         }
       />
 
-      {draft.status === "filed" && <p className="border border-border bg-muted/40 p-3 text-sm">This draft is filed: it is now part of the document's history and can no longer change.</p>}
+      {draft.status === "filed" && (
+        <div className="flex flex-wrap items-center justify-between gap-3 border border-border bg-muted/40 p-3 text-sm">
+          <span>This draft is filed: it is now part of the document's history and can no longer change.</span>
+          <div className="flex items-center gap-2">
+            {doc && (
+              <Button asChild size="sm" variant="outline">
+                <Link to="/org/documents/$documentId" params={{ documentId: doc.id }}>View in library</Link>
+              </Button>
+            )}
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={downloadingPdf}
+              onClick={() => void handleDownloadFiledDraftPdf()}
+            >
+              {downloadingPdf ? <Loader2 className="size-3 animate-spin" /> : <Download className="size-3" />}
+              <span>Download PDF</span>
+            </Button>
+          </div>
+        </div>
+      )}
       {draft.status === "closed" && (
         <p className="border border-border bg-muted/40 p-3 text-sm">
           {draft.closed_by ? `${person(draft.closed_by).name} closed this draft` : "This draft is closed"}
