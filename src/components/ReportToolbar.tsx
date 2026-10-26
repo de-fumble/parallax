@@ -89,73 +89,78 @@ export function ReportToolbar({ id, source, context, edited, canChange, onEdit, 
   const runAgain = { topic: source.topic, ...(context ? { context } : {}), mode: source.report.mode };
 
   return (
-    <div data-tour="report-toolbar" className="flex flex-wrap items-center gap-2 print:hidden">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size="sm" disabled={exporting !== null}>
-            {exporting ? <Loader2 className="animate-spin" /> : <Download />}
-            {exporting ? "Preparing…" : "Export"}
-            <ChevronDown />
+    <div data-tour="report-toolbar" className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4 mb-6 lg:mb-8 lg:pb-5 print:hidden">
+      <div className="flex flex-wrap items-center gap-2.5">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size="sm" disabled={exporting !== null} className="gap-2 shadow-2xs">
+              {exporting ? <Loader2 className="animate-spin size-3.5" /> : <Download className="size-3.5" />}
+              <span>{exporting ? "Preparing…" : "Export report"}</span>
+              <ChevronDown className="size-3 opacity-70" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-60 shadow-lg">
+            <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+              Document format
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {EXPORT_FORMATS.map((f) => (
+              <DropdownMenuItem key={f.id} onSelect={() => void download(f.id)} className="py-2">
+                <span className="font-medium">{f.label}</span>
+                <span className="ml-auto font-mono text-[11px] text-muted-foreground">{f.hint}</span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {canChange && (
+          <Button variant="outline" size="sm" onClick={onEdit} className="gap-1.5 border-border/80 hover:bg-muted/50">
+            <Pencil className="size-3.5" /> <span>Edit report</span>
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-56">
-          <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-            Download as
-          </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          {EXPORT_FORMATS.map((f) => (
-            <DropdownMenuItem key={f.id} onSelect={() => void download(f.id)}>
-              {f.label}
-              <span className="ml-auto font-mono text-xs text-muted-foreground">{f.hint}</span>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
+        )}
 
-      {canChange && (
-        <Button variant="outline" size="sm" onClick={onEdit}>
-          <Pencil /> Edit
-        </Button>
-      )}
+        {/* A row of six buttons wraps untidily on a phone, so the rest fold into one menu there. */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="icon" className="md:hidden size-8" aria-label="More actions">
+              <MoreHorizontal className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuItem onSelect={() => window.print()}><Printer className="size-4" /> Print document</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => void copy()}><Copy className="size-4" /> Copy markdown text</DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => navigate({ to: "/research", search: runAgain })}><RotateCw className="size-4" /> Run again</DropdownMenuItem>
+            {canChange && <DropdownMenuSeparator />}
+            {canChange && edited && <DropdownMenuItem onSelect={() => setConfirm("reset")}><Undo2 className="size-4" /> Reset to original</DropdownMenuItem>}
+            {canChange && <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setConfirm("delete")}><Trash2 className="size-4" /> Delete</DropdownMenuItem>}
+          </DropdownMenuContent>
+        </DropdownMenu>
 
-      {/* A row of six buttons wraps untidily on a phone, so the rest fold into one menu there. */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline" size="icon" className="md:hidden" aria-label="More actions">
-            <MoreHorizontal />
+        <div className="hidden flex-wrap items-center gap-2 md:flex">
+          <Button variant="outline" size="sm" onClick={() => window.print()} className="gap-1.5 border-border/80 hover:bg-muted/50">
+            <Printer className="size-3.5" /> <span>Print</span>
           </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-56">
-          <DropdownMenuItem onSelect={() => window.print()}><Printer /> Print</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => void copy()}><Copy /> Copy text</DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => navigate({ to: "/research", search: runAgain })}><RotateCw /> Run again</DropdownMenuItem>
-          {canChange && <DropdownMenuSeparator />}
-          {canChange && edited && <DropdownMenuItem onSelect={() => setConfirm("reset")}><Undo2 /> Reset to original</DropdownMenuItem>}
-          {canChange && <DropdownMenuItem className="text-destructive focus:text-destructive" onSelect={() => setConfirm("delete")}><Trash2 /> Delete</DropdownMenuItem>}
-        </DropdownMenuContent>
-      </DropdownMenu>
+          <Button variant="outline" size="sm" onClick={() => void copy()} className="gap-1.5 border-border/80 hover:bg-muted/50">
+            {copied ? <Check className="size-3.5 text-strong" /> : <Copy className="size-3.5" />}
+            <span>{copied ? "Copied" : "Copy text"}</span>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="gap-1.5 border-border/80 hover:bg-muted/50">
+            <Link to="/research" search={runAgain}>
+              <RotateCw className="size-3.5" /> <span>Re-run inquiry</span>
+            </Link>
+          </Button>
+        </div>
+      </div>
 
-      <div className="hidden flex-wrap items-center gap-2 md:flex">
-        <Button variant="outline" size="sm" onClick={() => window.print()}>
-          <Printer /> Print
-        </Button>
-        <Button variant="outline" size="sm" onClick={() => void copy()}>
-          {copied ? <Check /> : <Copy />}
-          {copied ? "Copied" : "Copy text"}
-        </Button>
-        <Button asChild variant="outline" size="sm">
-          <Link to="/research" search={runAgain}>
-            <RotateCw /> Run again
-          </Link>
-        </Button>
+      <div className="hidden items-center gap-2 md:flex">
         {canChange && edited && (
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setConfirm("reset")}>
-            <Undo2 /> Reset to original
+          <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-foreground" onClick={() => setConfirm("reset")}>
+            <Undo2 className="size-3.5 mr-1" /> Reset to original
           </Button>
         )}
         {canChange && (
-          <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => setConfirm("delete")}>
-            <Trash2 /> Delete
+          <Button variant="ghost" size="sm" className="text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10" onClick={() => setConfirm("delete")}>
+            <Trash2 className="size-3.5 mr-1" /> Delete
           </Button>
         )}
       </div>

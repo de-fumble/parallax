@@ -147,12 +147,12 @@ function SectionFrame({
       id={`section-${sectionKey}`}
       data-outline={title}
       onClick={onEditRequest ? (e) => requestEdit(e, () => onEditRequest(sectionKey)) : undefined}
-      className={`group/section mt-12 scroll-mt-28 ${HALF_WIDTH.has(sectionKey) ? "" : "md:col-span-2"} ${
+      className={`group/section mt-12 lg:mt-16 scroll-mt-28 ${HALF_WIDTH.has(sectionKey) ? "" : "md:col-span-2"} ${
         editor ? "border border-dashed border-border p-3 sm:p-4" : onEditRequest ? "editable-region" : ""
       }`}
     >
-      <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
-        <h2 className="min-w-0 text-2xl">{title}</h2>
+      <div className="flex items-center justify-between gap-3 border-b border-border/70 pb-3">
+        <h2 className="min-w-0 font-serif text-2xl lg:text-3xl tracking-tight text-foreground">{title}</h2>
         {editor ? (
           <div className="flex shrink-0 items-center gap-0.5 print:hidden">
             <Button type="button" variant="ghost" size="icon" className="size-10 md:size-8" disabled={position === 0} aria-label={`Move ${title} up`} onClick={() => editor.move(sectionKey, -1)}>
@@ -169,7 +169,7 @@ function SectionFrame({
           onEditRequest && <EditHint />
         )}
       </div>
-      <div className="mt-4">{children}</div>
+      <div className="mt-5 lg:mt-6">{children}</div>
     </section>
   );
 }
@@ -201,20 +201,20 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
 
   const body: Record<SectionKey, () => ReactNode> = {
     template: () => (
-      <div className="space-y-8">
+      <div className="space-y-10 lg:space-y-12">
         {(r.template_sections ?? []).map((s, i) => (
-          <div key={i}>
-            <div className="flex items-start gap-1">
-              <h3 className="min-w-0 flex-1 text-xl">
+          <div key={i} className="border-b border-border/40 pb-8 last:border-b-0 last:pb-0">
+            <div className="flex items-start gap-2">
+              <h3 className="min-w-0 flex-1 font-serif text-xl lg:text-2xl text-foreground font-normal">
                 <Text editing={editing} cite={false} value={s.title} label={`Section ${i + 1} title`} onChange={(v) => update((d) => { d.template_sections![i]!.title = v; })} />
               </h3>
               {editing && <RemoveButton label={`Remove section ${i + 1}`} onClick={() => update((d) => { d.template_sections!.splice(i, 1); })} />}
             </div>
-            <div className="mt-2 space-y-3 leading-relaxed">
+            <div className="mt-3.5 space-y-4 text-base lg:text-[17px] leading-relaxed text-foreground/90">
               {editing ? (
                 <Text editing value={s.content} label={`Section ${i + 1} content`} onChange={(v) => update((d) => { d.template_sections![i]!.content = v; })} />
               ) : (
-                s.content.split(/\n{2,}/).filter((p) => p.trim()).map((p, j) => <p key={j}><Cited text={p} /></p>)
+                s.content.split(/\n{2,}/).filter((p) => p.trim()).map((p, j) => <p key={j} className="leading-relaxed"><Cited text={p} /></p>)
               )}
             </div>
           </div>
@@ -223,18 +223,18 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
     ),
 
     findings: () => (
-      <ol className="space-y-5">
+      <ol className="space-y-6 lg:space-y-7">
         {r.key_findings.map((f, i) => (
-          <li key={i} className="grid grid-cols-[2rem_1fr] gap-2">
-            <span className="font-mono text-sm text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+          <li key={i} className="grid grid-cols-[2.5rem_1fr] lg:grid-cols-[3rem_1fr] gap-2 lg:gap-3">
+            <span className="font-mono text-sm lg:text-base font-medium text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
             <div className="min-w-0">
               <div className="flex items-start gap-1">
-                <div className="min-w-0 flex-1 leading-relaxed">
+                <div className="min-w-0 flex-1 leading-relaxed text-base lg:text-[17px]">
                   <Text editing={editing} value={f.finding} label={`Finding ${i + 1}`} onChange={(v) => update((d) => { d.key_findings[i]!.finding = v; })} />
                 </div>
                 {editing && <RemoveButton label={`Remove finding ${i + 1}`} onClick={() => update((d) => { d.key_findings.splice(i, 1); })} />}
               </div>
-              <div className="mt-2 flex flex-wrap gap-1.5">
+              <div className="mt-2.5 flex flex-wrap gap-1.5">
                 <Tag tone={f.evidence_quality}>{f.evidence_quality}</Tag>
                 {f.flags?.map((fl) => <Tag key={fl}>{fl.replace("_", " ")}</Tag>)}
               </div>
@@ -381,26 +381,26 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
       <div
         id="section-summary"
         onClick={onEditRequest ? (e) => requestEdit(e, () => onEditRequest("summary")) : undefined}
-        className={`group/section mt-6 scroll-mt-28 sm:mt-8 ${editing ? "border border-dashed border-border p-3 sm:p-4" : onEditRequest ? "editable-region" : ""}`}
+        className={`group/section mt-6 sm:mt-8 lg:mt-10 scroll-mt-28 ${editing ? "border border-dashed border-border p-3 sm:p-4" : onEditRequest ? "editable-region" : ""}`}
       >
         <div className="flex flex-wrap items-center gap-2">
           <Tag>{r.mode}</Tag>
           <Tag tone={r.status === "OK" ? "HIGH" : r.status === "PARTIAL" ? "MEDIUM" : "LOW"}>{r.status?.replace("_", " ")}</Tag>
           <Tag tone={r.confidence}>{r.confidence} confidence</Tag>
-          <span className="font-mono text-xs text-muted-foreground">{new Date(createdAt).toLocaleDateString()}</span>
+          <span className="font-mono text-xs text-muted-foreground ml-1">{new Date(createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</span>
           {!editing && onEditRequest && <span className="ml-auto"><EditHint /></span>}
         </div>
-        <h1 className="mt-4 text-3xl leading-tight sm:text-4xl md:text-5xl">
+        <h1 className="mt-5 font-serif text-3xl leading-[1.12] sm:text-4xl md:text-5xl lg:text-6xl tracking-tight text-foreground">
           <Text editing={editing} cite={false} value={r.research_title} label="Report title" onChange={(v) => update((d) => { d.research_title = v; })} />
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">{topic}</p>
+        <p className="mt-3 text-sm sm:text-base lg:text-lg text-muted-foreground font-light leading-relaxed max-w-3xl">{topic}</p>
 
-        <div className="mt-8 border-l-2 border-accent pl-5">
-          <div className="font-mono text-xs uppercase tracking-widest text-accent">Bottom line</div>
-          <div className="mt-2 text-lg leading-relaxed">
+        <div className="mt-10 lg:mt-12 border-l-2 border-foreground pl-6 lg:pl-8 py-2 bg-muted/20 rounded-r-md">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-foreground font-semibold">Bottom line // Synthesis</div>
+          <div className="mt-3 font-serif text-xl lg:text-2xl leading-relaxed text-foreground">
             <Text editing={editing} value={r.bottom_line} label="Bottom line" onChange={(v) => update((d) => { d.bottom_line = v; })} />
           </div>
-          <div className="mt-3 text-sm text-muted-foreground">
+          <div className="mt-3 text-xs lg:text-sm text-muted-foreground font-mono">
             <Text editing={editing} cite={false} value={r.confidence_rationale} label="Confidence rationale" onChange={(v) => update((d) => { d.confidence_rationale = v; })} />
           </div>
         </div>
@@ -413,7 +413,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
         )}
       </div>
 
-      <div className="grid gap-x-10 md:grid-cols-2">
+      <div className="grid gap-x-12 lg:gap-x-16 md:grid-cols-2">
         {visible.map((key, i) => (
           <SectionFrame key={key} sectionKey={key} position={i} count={visible.length} editor={editor} onEditRequest={onEditRequest}>
             {body[key]()}

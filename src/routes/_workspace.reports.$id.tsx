@@ -187,9 +187,9 @@ function ReportPage() {
       <div ref={article} className={`animate-in fade-in duration-300 [overflow-wrap:anywhere] ${draft ? "pb-28 md:pb-0" : ""}`}>
         {draft ? (
           // Pinned to the bottom edge on a phone, within thumb reach; a bar under the header on larger screens.
-          <div className="pb-safe fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-foreground bg-background px-4 pt-3 shadow-sm md:sticky md:inset-x-auto md:bottom-auto md:top-14 md:z-20 md:-mx-2 md:flex-wrap md:border md:py-3 print:hidden">
+          <div className="pb-safe fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-foreground bg-background px-4 pt-3 shadow-sm md:sticky md:inset-x-auto md:bottom-auto md:top-14 md:z-20 md:-mx-2 md:flex-wrap md:border md:py-3 lg:top-15 lg:px-6 lg:py-3.5 lg:border-border/80 lg:bg-background/90 lg:backdrop-blur-md lg:shadow-xs print:hidden">
             <div className="min-w-0">
-              <div className="text-sm font-medium">Editing report</div>
+              <div className="text-sm font-medium tracking-tight">Editing report</div>
               <div className="truncate text-xs text-muted-foreground md:whitespace-normal">
                 {dirty ? "You have unsaved changes." : <><span className="md:hidden">Tap any text to change it.</span><span className="hidden md:inline">Click any text to change it. Use the arrows to move a section.</span></>}
               </div>
@@ -265,8 +265,8 @@ function ReportSkeleton() {
 
 function Shell({ children, outline }: { children: ReactNode; outline?: ReactNode }) {
   return (
-    <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 py-6 sm:px-6 sm:py-10 xl:grid-cols-[minmax(0,1fr)_13rem]">
-      <div className="min-w-0 max-w-4xl">{children}</div>
+    <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-6 sm:px-6 sm:py-10 lg:px-8 lg:py-12 xl:max-w-7xl xl:gap-14 xl:grid-cols-[minmax(0,1fr)_16rem] 2xl:max-w-[86rem] 2xl:gap-20 2xl:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="min-w-0 max-w-4xl 2xl:max-w-5xl">{children}</div>
       {outline}
     </div>
   );

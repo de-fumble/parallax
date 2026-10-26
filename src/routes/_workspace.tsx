@@ -61,24 +61,26 @@ function Workspace() {
         <OrgBranding />
         <WorkspaceSidebar onSearch={() => setSearchOpen(true)} />
         <SidebarInset className="min-w-0 pb-[var(--tabbar-h,0px)] md:pb-0">
-          <header className="workspace-bar sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-3 backdrop-blur-xl sm:px-4">
+          <header className="workspace-bar sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/70 bg-background/85 px-3 backdrop-blur-xl sm:px-4 lg:h-15 lg:px-8">
             <MobileDrawerButton />
-            <SidebarTrigger className="hidden md:inline-flex" />
-            <span className="hidden h-4 w-px bg-border md:block" />
+            <SidebarTrigger className="hidden md:inline-flex text-muted-foreground transition-colors hover:text-foreground" />
+            <span className="hidden h-4 w-px bg-border/60 md:block" />
             <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2 text-sm">
-              <span className="hidden max-w-40 truncate text-muted-foreground md:inline">{workspace.name}</span>
-              <span className="hidden text-muted-foreground md:inline">/</span>
-              <span className="truncate text-lg font-semibold tracking-tight md:text-sm md:font-medium">{sectionName(pathname)}</span>
+              <span className="hidden max-w-44 truncate font-mono text-xs tracking-tight text-muted-foreground md:inline">{workspace.name}</span>
+              <span className="hidden text-xs text-border/80 md:inline">/</span>
+              <span className="truncate text-lg font-semibold tracking-tight md:text-sm md:font-medium text-foreground">{sectionName(pathname)}</span>
             </nav>
             <button
               type="button"
               onClick={() => setSearchOpen(true)}
               aria-label="Search reports"
-              className="ml-auto hidden h-8 items-center justify-center gap-2 border border-border bg-card px-3 text-xs text-muted-foreground transition-colors hover:border-foreground/40 hover:text-foreground md:flex"
+              className="ml-auto hidden h-8 items-center justify-between gap-3 border border-border/80 bg-card/60 px-3 text-xs text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:bg-card hover:text-foreground hover:shadow-xs md:flex lg:w-64 xl:w-72"
             >
-              <Search className="size-3.5" />
-              <span>Search reports</span>
-              <kbd className="font-mono text-[10px]">⌘K</kbd>
+              <div className="flex items-center gap-2 min-w-0">
+                <Search className="size-3.5 shrink-0 opacity-70" />
+                <span className="truncate">Search reports…</span>
+              </div>
+              <kbd className="font-mono text-[10px] rounded border border-border/60 bg-muted/60 px-1 py-0.5 text-muted-foreground">⌘K</kbd>
             </button>
           </header>
           <div key={pathname} className="page-enter">

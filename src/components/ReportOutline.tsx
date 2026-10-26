@@ -42,22 +42,50 @@ export function ReportOutline({ container, revision, floating = true }: Props) {
 
   return (
     <>
-      <nav aria-label="On this page" className="sticky top-20 hidden max-h-[calc(100vh-6rem)] overflow-auto text-sm xl:block print:hidden">
-        <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">On this page</div>
-        <ul className="mt-3 border-l border-border">
-          {entries.map((e) => (
-            <li key={e.id}>
-              <a
-                href={`#${e.id}`}
-                className={`-ml-px block border-l py-1 pl-3 transition-colors ${
-                  active === e.id ? "border-foreground text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {e.title}
-              </a>
-            </li>
-          ))}
-        </ul>
+      <nav aria-label="Document index" className="sticky top-20 xl:top-24 hidden max-h-[calc(100vh-7rem)] overflow-y-auto editorial-scrollbar xl:block print:hidden pb-8">
+        <div className="border border-border/75 bg-card/60 p-4 xl:p-5 backdrop-blur-xs shadow-2xs">
+          <div className="flex items-center justify-between border-b border-border/60 pb-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+            <span>Index // Outline</span>
+            <span className="rounded bg-muted/60 px-1.5 py-0.5 text-[9px]">{entries.length} sections</span>
+          </div>
+          <ul className="mt-3 space-y-1">
+            {entries.map((e, index) => {
+              const isActive = active === e.id;
+              return (
+                <li key={e.id}>
+                  <a
+                    href={`#${e.id}`}
+                    className={`group flex items-center justify-between gap-2.5 rounded px-2.5 py-1.5 text-xs xl:text-[13px] transition-all duration-150 ${
+                      isActive
+                        ? "bg-muted font-medium text-foreground shadow-2xs"
+                        : "text-muted-foreground hover:bg-muted/40 hover:text-foreground"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`font-mono text-[10px] tabular-nums shrink-0 transition-colors ${isActive ? "text-foreground font-semibold" : "text-muted-foreground/60"}`}>
+                        {String(index + 1).padStart(2, "0")}
+                      </span>
+                      <span className="truncate">{e.title}</span>
+                    </div>
+                    {isActive && (
+                      <span className="size-1.5 shrink-0 rounded-full bg-accent" />
+                    )}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="mt-5 border-t border-border/50 pt-3">
+            <a
+              href="#section-summary"
+              className="flex items-center justify-between text-[11px] font-mono uppercase tracking-wider text-muted-foreground/75 hover:text-foreground transition-colors py-1"
+            >
+              <span>↑ Return to top</span>
+              <span className="text-[10px] opacity-60">Top</span>
+            </a>
+          </div>
+        </div>
       </nav>
 
       {floating && (
