@@ -110,9 +110,68 @@ function searchProviders(): SearchProvider[] {
   return order.map((id) => all[id]).filter((p): p is SearchProvider => !!p && !!p.key);
 }
 
+const ARXIV_RESULTS_BY_MODE: Partial<Record<Mode, number>> = { MEDIUM: 4, DEEP: 8 };
+const ARXIV_STOPWORDS = new Set(["the", "a", "an", "of", "and", "or", "to", "in", "on", "for", "is", "are", "with", "what", "how", "why", "does", "do", "vs"]);
+
+const decodeXml = (s: string) =>
+  s.replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, "&");
+const xmlTag = (xml: string, tag: string) => {
+  const m = xml.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)</${tag}>`));
+  return m ? decodeXml(m[1]!).replace(/\s+/g, " ").trim() : "";
+};
+
+// arXiv's public Atom API: free, no key. Returns paper abstracts as sources.
+async function arxivSearch(query: string, mode: Mode): Promise<WebResult[]> {
+  const max = ARXIV_RESULTS_BY_MODE[mode];
+  if (!max) return [];
+  const terms = query
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, " ")
+    .split(/\s+/)
+    .filter((w) => w.length > 2 && !ARXIV_STOPWORDS.has(w))
+    .slice(0, 8);
+  if (terms.length === 0) return [];
+  const params = new URLSearchParams({
+    search_query: `all:(${terms.join(" OR ")})`,
+    start: "0",
+    max_results: String(max),
+    sortBy: "relevance",
+    sortOrder: "descending",
+  });
+  const res = await fetch(`https://export.arxiv.org/api/query?${params}`, { signal: AbortSignal.timeout(SEARCH_TIMEOUT_MS) });
+  if (!res.ok) throw new Error(`arXiv search failed [${res.status}]`);
+  const xml = await res.text();
+  const out: WebResult[] = [];
+  for (const entry of xml.split("<entry>").slice(1)) {
+    const id = xmlTag(entry, "id");
+    const summary = xmlTag(entry, "summary");
+    if (!id || !summary) continue;
+    out.push({
+      title: xmlTag(entry, "title") || undefined,
+      url: id.replace(/^http:/, "https:"),
+      content: summary,
+      published_date: xmlTag(entry, "published") || null,
+    });
+  }
+  return out;
+}
+
+/** Web results plus, for Medium and Deep research, relevant arXiv papers. */
+export async function webSearch(query: string, mode: Mode): Promise<WebResult[]> {
+  const [web, papers] = await Promise.all([
+    webSearchProviders(query, mode),
+    arxivSearch(query, mode).catch((err) => {
+      console.warn(`[search] arXiv failed: ${err instanceof Error ? err.message : String(err)}`);
+      return [] as WebResult[];
+    }),
+  ]);
+  const seen = new Set(web.map((r) => r.url));
+  return [...web, ...papers.filter((p) => !seen.has(p.url))];
+}
+
 // Try each configured search service until one returns results. A service
 // that fails (bad key, no credit, rate limit, timeout) hands over to the next.
-export async function webSearch(query: string, mode: Mode): Promise<WebResult[]> {
+async function webSearchProviders(query: string, mode: Mode): Promise<WebResult[]> {
   const providers = searchProviders();
   if (providers.length === 0) throw new Error("Web search is not configured. Set EXA_API_KEY or TAVILY_API_KEY.");
   let lastError: Error | null = null;
