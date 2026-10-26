@@ -1,7 +1,8 @@
 import { createOpenAI } from "@ai-sdk/openai";
 import { streamText } from "ai";
 import { PARALLAX_SYSTEM_PROMPT } from "./research.prompt";
-import { MAX_MANUAL_SOURCE_CHARS, type ManualSource, type Mode, type Report, type RetrievedSource } from "./research.types";
+import { templateInstructions } from "./research.template";
+import { MAX_MANUAL_SOURCE_CHARS, type ManualSource, type Mode, type Report, type ResearchTemplate, type RetrievedSource } from "./research.types";
 
 // Any OpenAI-compatible chat completions API works. These apply only when a
 // provider is configured without a base URL or model of its own.
@@ -251,7 +252,7 @@ function providerMessage(body?: string): string {
   }
 }
 
-type ReportRequest = { topic: string; mode: Mode; context: string; sources: RetrievedSource[] };
+type ReportRequest = { topic: string; mode: Mode; context: string; sources: RetrievedSource[]; template?: ResearchTemplate | null | undefined };
 
 /** The model answered, but not with a report that can be parsed. */
 class UnreadableReport extends Error {}
@@ -345,7 +346,7 @@ async function requestReport(input: ReportRequest, route: AiRoute): Promise<Repo
   let streamError: unknown;
   const result = streamText({
     model: provider.chat(route.model),
-    instructions: PARALLAX_SYSTEM_PROMPT,
+    instructions: PARALLAX_SYSTEM_PROMPT + (input.template?.enabled ? templateInstructions(input.template.sections) : ""),
     messages: [{ role: "user", content: userMessage }],
     abortSignal: stall.signal,
     onError: ({ error }) => {

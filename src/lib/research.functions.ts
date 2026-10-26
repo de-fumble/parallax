@@ -5,6 +5,8 @@ import {
   MAX_MANUAL_SOURCE_CHARS,
   MAX_MANUAL_SOURCES,
   MAX_MANUAL_TOTAL_CHARS,
+  MAX_TEMPLATE_SECTION_TITLE,
+  MAX_TEMPLATE_SECTIONS,
   RUN_STALE_AFTER_MS,
   type RetrievedSource,
   type RunResult,
@@ -22,6 +24,14 @@ const StartInput = z.object({
   mode: z.enum(["LIGHT", "MEDIUM", "DEEP"]),
   context: z.string().max(4000).default(""),
   useWeb: z.boolean(),
+  // The professional research structure; absent or disabled keeps the normal report.
+  template: z
+    .object({
+      enabled: z.boolean(),
+      sections: z.array(z.string().max(MAX_TEMPLATE_SECTION_TITLE)).max(MAX_TEMPLATE_SECTIONS),
+    })
+    .nullable()
+    .optional(),
   manual: z
     .array(
       z.object({

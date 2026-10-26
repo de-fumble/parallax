@@ -54,6 +54,18 @@ export function buildExportDoc({ topic, created_at, report: r, layout, hidden }:
   add("Warnings", list(r.warnings));
 
   put(
+    "template",
+    (r.template_sections ?? []).flatMap((s): Block[] => [
+      { type: "subheading", text: s.title },
+      ...s.content
+        .split(/\n{2,}/)
+        .map((p) => p.trim())
+        .filter(Boolean)
+        .map((text): Block => ({ type: "paragraph", text })),
+    ]),
+  );
+
+  put(
     "findings",
     (r.key_findings ?? []).flatMap((f, i): Block[] => {
       const notes = [`Evidence: ${label(f.evidence_quality)}`, ...(f.flags ?? []).map(label)].join(" · ");

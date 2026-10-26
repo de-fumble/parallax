@@ -200,6 +200,28 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
   const restorable = editing ? layout.filter((key) => hidden.includes(key)) : [];
 
   const body: Record<SectionKey, () => ReactNode> = {
+    template: () => (
+      <div className="space-y-8">
+        {(r.template_sections ?? []).map((s, i) => (
+          <div key={i}>
+            <div className="flex items-start gap-1">
+              <h3 className="min-w-0 flex-1 text-xl">
+                <Text editing={editing} cite={false} value={s.title} label={`Section ${i + 1} title`} onChange={(v) => update((d) => { d.template_sections![i]!.title = v; })} />
+              </h3>
+              {editing && <RemoveButton label={`Remove section ${i + 1}`} onClick={() => update((d) => { d.template_sections!.splice(i, 1); })} />}
+            </div>
+            <div className="mt-2 space-y-3 leading-relaxed">
+              {editing ? (
+                <Text editing value={s.content} label={`Section ${i + 1} content`} onChange={(v) => update((d) => { d.template_sections![i]!.content = v; })} />
+              ) : (
+                s.content.split(/\n{2,}/).filter((p) => p.trim()).map((p, j) => <p key={j}><Cited text={p} /></p>)
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    ),
+
     findings: () => (
       <ol className="space-y-5">
         {r.key_findings.map((f, i) => (

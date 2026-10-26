@@ -3,9 +3,12 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
-import { ArrowRight, FileText, Globe, Loader2, Plus, Upload, X } from "lucide-react";
+import { ArrowRight, FileText, Globe, Loader2, Plus, RotateCcw, Upload, X } from "lucide-react";
 import {
+  DEFAULT_TEMPLATE_SECTIONS,
   MAX_MANUAL_SOURCE_CHARS,
+  MAX_TEMPLATE_SECTION_TITLE,
+  MAX_TEMPLATE_SECTIONS,
   MAX_MANUAL_SOURCES,
   MAX_MANUAL_TOTAL_CHARS,
   MAX_UPLOAD_BYTES,
@@ -63,6 +66,18 @@ const EXAMPLES = [
 // What the form tracks about an uploaded document beyond what is sent with the run.
 type FormSource = ManualSource & { originalChars?: number; fileSize?: number };
 
+// The user's own version of the professional structure is remembered in this browser.
+const SECTIONS_KEY = "parallax.template.sections";
+function loadSections(): string[] {
+  try {
+    const saved = JSON.parse(localStorage.getItem(SECTIONS_KEY) ?? "null") as unknown;
+    if (Array.isArray(saved) && saved.every((s) => typeof s === "string")) return saved.slice(0, MAX_TEMPLATE_SECTIONS);
+  } catch {
+    // Storage unavailable or corrupt: use the standard structure.
+  }
+  return [...DEFAULT_TEMPLATE_SECTIONS];
+}
+
 function formatBytes(bytes: number) {
   return bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
@@ -83,14 +98,40 @@ function Research() {
   const [context, setContext] = useState(() => getDraft().context);
   const [mode, setMode] = useState<Mode>(() => getDraft().mode);
   const [useWeb, setUseWeb] = useState(() => getDraft().useWeb);
+  const [templateOn, setTemplateOn] = useState(() => getDraft().template?.enabled ?? false);
+  const [sections, setSections] = useState<string[]>(() => getDraft().template?.sections ?? loadSections());
+  const [newSection, setNewSection] = useState("");
   const [manual, setManual] = useState<FormSource[]>(() => getDraft().manual);
   const [reading, setReading] = useState(0);
   const [dragging, setDragging] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    saveDraft({ topic, context, mode, useWeb, manual });
-  }, [topic, context, mode, useWeb, manual]);
+    saveDraft({ topic, context, mode, useWeb, template: { enabled: templateOn, sections }, manual });
+  }, [topic, context, mode, useWeb, templateOn, sections, manual]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SECTIONS_KEY, JSON.stringify(sections));
+    } catch {
+      // Not remembered; still works for this visit.
+    }
+  }, [sections]);
+
+  function addSection() {
+    const title = newSection.replace(/\s+/g, " ").trim().slice(0, MAX_TEMPLATE_SECTION_TITLE);
+    if (!title) return;
+    if (sections.some((s) => s.toLowerCase() === title.toLowerCase())) {
+      toast.error("That section is already in the structure.");
+      return;
+    }
+    if (sections.length >= MAX_TEMPLATE_SECTIONS) {
+      toast.error(`A structure can have up to ${MAX_TEMPLATE_SECTIONS} sections.`);
+      return;
+    }
+    setSections([...sections, title]);
+    setNewSection("");
+  }
 
   // A pre-filled link replaces the form once, then leaves the URL clean so a
   // reload doesn't overwrite later edits.
@@ -123,6 +164,10 @@ function Research() {
     setContext(failedInput.context);
     setMode(failedInput.mode);
     setUseWeb(failedInput.useWeb);
+    if (failedInput.template) {
+      setTemplateOn(failedInput.template.enabled);
+      setSections(failedInput.template.sections);
+    }
     setManual(failedInput.manual);
   }, [failedInput, topic]);
 
@@ -175,6 +220,10 @@ function Research() {
       toast.error("Still reading your documents. Try again in a moment.");
       return;
     }
+    if (templateOn && sections.length === 0) {
+      toast.error("Add at least one section, or turn the professional structure off.");
+      return;
+    }
     if (!useWeb && usableSources.length === 0) {
       toast.error("Turn on web search or add at least one source.");
       return;
@@ -193,6 +242,7 @@ function Research() {
       context,
       mode,
       useWeb,
+      template: templateOn ? { enabled: true, sections } : null,
       manual: usableSources.map(({ title, url, text, fileName }) => ({ title, url, text, ...(fileName ? { fileName } : {}) })),
     });
     saveDraft(EMPTY_DRAFT);
@@ -446,6 +496,56 @@ function Research() {
                     </button>
                   ))}
                 </div>
+              </section>
+
+              <section data-tour="template" className="border border-border bg-card">
+                <header className="border-b border-border px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  Professional structure
+                </header>
+                <div className="flex items-center justify-between gap-4 p-5">
+                  <div>
+                    <Label htmlFor="template" className="text-sm font-medium">Professional research template</Label>
+                    <div className="text-xs text-muted-foreground">
+                      {templateOn ? "The report follows the sections below." : "Off — the report uses its normal structure."}
+                    </div>
+                  </div>
+                  <Switch id="template" checked={templateOn} onCheckedChange={setTemplateOn} />
+                </div>
+                {templateOn && (
+                  <div className="space-y-3 border-t border-border p-5 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <ol className="space-y-1.5">
+                      {sections.map((s, i) => (
+                        <li key={s} className="flex items-center gap-2 border border-border px-3 py-1.5 text-sm">
+                          <span className="font-mono text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</span>
+                          <span className="min-w-0 flex-1 truncate">{s}</span>
+                          <Button type="button" variant="ghost" size="icon" className="size-7" aria-label={`Remove ${s}`} onClick={() => setSections(sections.filter((_, j) => j !== i))}>
+                            <X />
+                          </Button>
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="flex gap-2">
+                      <Input
+                        aria-label="New section name"
+                        placeholder="Add a section…"
+                        maxLength={MAX_TEMPLATE_SECTION_TITLE}
+                        value={newSection}
+                        onChange={(e) => setNewSection(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            addSection();
+                          }
+                        }}
+                      />
+                      <Button type="button" variant="outline" size="icon" aria-label="Add section" onClick={addSection}><Plus /></Button>
+                    </div>
+                    <Button type="button" variant="ghost" size="sm" onClick={() => setSections([...DEFAULT_TEMPLATE_SECTIONS])}>
+                      <RotateCcw /> Reset to standard structure
+                    </Button>
+                  </div>
+                )}
               </section>
 
               {workspace.org && projects.data && projects.data.length > 0 && (

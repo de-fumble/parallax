@@ -1,6 +1,6 @@
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { generateReport, TemporaryAiFailure } from "./research.server";
-import { MAX_AUTO_RETRIES, type Mode, type RetrievedSource, type RunResult } from "./research.types";
+import { MAX_AUTO_RETRIES, type Mode, type ResearchTemplate, type RetrievedSource, type RunResult } from "./research.types";
 
 // The part of a research run that can be picked up again: writing the report
 // from sources already saved. A fresh run, a retry asked for in the browser and
@@ -13,6 +13,7 @@ type StoredInput = {
   orgId?: string | null;
   draftProjectId?: string | null;
   draftKind?: string;
+  template?: ResearchTemplate | null | undefined;
 };
 
 type DraftTarget = { projectId: string; kind: string } | null;
@@ -42,7 +43,7 @@ export async function writeStage(run: {
   failures: number;
 }): Promise<RunResult> {
   try {
-    const report = await generateReport({ topic: run.input.topic, mode: run.input.mode, context: run.input.context, sources: run.sources });
+    const report = await generateReport({ topic: run.input.topic, mode: run.input.mode, context: run.input.context, sources: run.sources, template: run.input.template });
     const { data: row, error } = await supabaseAdmin
       .from("reports")
       .insert({

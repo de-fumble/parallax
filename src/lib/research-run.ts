@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { reportQuery, type ReportDetail } from "./reports.queries";
 import { resumeResearch, runResearch } from "./research.functions";
-import { MAX_AUTO_RETRIES, RUN_STALE_AFTER_MS, type ManualSource, type Mode, type RunResult } from "./research.types";
+import { MAX_AUTO_RETRIES, RUN_STALE_AFTER_MS, type ManualSource, type Mode, type ResearchTemplate, type RunResult } from "./research.types";
 
 // The state of a research run lives in the research_runs table, written by the
 // server as the job advances. This module reads it back, so the same progress
@@ -20,6 +20,8 @@ export type ResearchInput = {
   context: string;
   mode: Mode;
   useWeb: boolean;
+  /** The professional research structure; absent or disabled means the normal report. */
+  template?: ResearchTemplate | null | undefined;
   manual: ManualSource[];
 };
 

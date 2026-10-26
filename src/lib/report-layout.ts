@@ -5,6 +5,7 @@ import type { Report } from "./research.types";
 // so "reset to original" is always possible.
 
 export const SECTION_KEYS = [
+  "template",
   "findings",
   "subtopics",
   "comparison",
@@ -21,6 +22,7 @@ export const SECTION_KEYS = [
 export type SectionKey = (typeof SECTION_KEYS)[number];
 
 export const SECTION_TITLES: Record<SectionKey, string> = {
+  template: "Research report",
   findings: "Key findings",
   subtopics: "Subtopics",
   comparison: "Comparison",
@@ -39,6 +41,7 @@ export const HALF_WIDTH: ReadonlySet<SectionKey> = new Set(["implications", "ris
 
 export function sectionHasContent(r: Report, key: SectionKey): boolean {
   switch (key) {
+    case "template": return (r.template_sections?.length ?? 0) > 0;
     case "findings": return (r.key_findings?.length ?? 0) > 0;
     case "subtopics": return (r.subtopics?.length ?? 0) > 0;
     case "comparison": return !!r.comparison?.applicable;

@@ -1,5 +1,23 @@
 export type Mode = "LIGHT" | "MEDIUM" | "DEEP";
 
+/** The professional research structure a user can switch on, and the sections it follows. */
+export type ResearchTemplate = { enabled: boolean; sections: string[] };
+
+/** A standard professional report layout. Users can add to it or remove from it. */
+export const DEFAULT_TEMPLATE_SECTIONS = [
+  "Executive summary",
+  "Introduction and background",
+  "Research questions and objectives",
+  "Methodology",
+  "Findings",
+  "Analysis and discussion",
+  "Limitations",
+  "Conclusions",
+  "Recommendations",
+];
+export const MAX_TEMPLATE_SECTIONS = 20;
+export const MAX_TEMPLATE_SECTION_TITLE = 80;
+
 export type ManualSource = {
   title: string;
   url: string;
@@ -21,6 +39,8 @@ export type RetrievedSource = {
 export type Report = {
   research_title: string;
   mode: Mode;
+  /** Present only when the professional research structure was switched on. */
+  template_sections?: { title: string; content: string; source_ids: string[] }[];
   status: "OK" | "PARTIAL" | "INSUFFICIENT_EVIDENCE";
   bottom_line: string;
   confidence: "HIGH" | "MEDIUM" | "LOW";
