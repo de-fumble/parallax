@@ -35,7 +35,7 @@ export function MobileTabBar({ onSearch }: { onSearch: () => void }) {
   return (
     <nav aria-label="Main" className="tabbar fixed z-40 flex md:hidden print:hidden">
       <Link to="/research" onClick={tap} className={tab(researchActive)} aria-label="New research" aria-current={researchActive ? "page" : undefined}>
-        {running ? <Loader2 className={`${icon(true)} animate-spin text-accent`} /> : <SquarePen className={icon(researchActive)} strokeWidth={researchActive ? 2.25 : 1.75} />}
+        {running ? <Loader2 className={`${icon(true)} animate-spin text-foreground`} /> : <SquarePen className={icon(researchActive)} strokeWidth={researchActive ? 2.25 : 1.75} />}
         <span>{running ? "Running" : "Research"}</span>
         {ready && !researchActive && <span aria-hidden className="absolute right-[26%] top-2 size-2.5 rounded-full bg-strong ring-2 ring-background" />}
       </Link>

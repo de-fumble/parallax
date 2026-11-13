@@ -123,7 +123,7 @@ function Library() {
       ) : library.isError ? (
         <LoadError error={library.error} />
       ) : shown.length === 0 ? (
-        <div className="border border-dashed border-border">
+        <div className="rounded-xl border border-dashed border-border">
           <Empty>{library.data.length === 0 && !term ? "Nothing has been filed yet. Approved review requests land here." : "No filed research matches."}</Empty>
         </div>
       ) : (
@@ -132,12 +132,12 @@ function Library() {
             const summary = d.sections.find((s) => s.body.trim())?.body ?? "";
             return (
               <li key={d.id}>
-                <div className="flex h-full flex-col border border-border bg-card p-4 transition-colors hover:border-foreground/40">
+                <div className="rounded-xl flex h-full flex-col border border-border bg-card p-4 transition-colors hover:border-foreground/40">
                   <div className="flex items-start justify-between gap-2">
                     <Link
                       to="/org/documents/$documentId"
                       params={{ documentId: d.id }}
-                      className="font-serif text-xl leading-snug hover:underline"
+                      className="text-base font-semibold leading-snug tracking-tight hover:underline"
                     >
                       {d.title}
                     </Link>

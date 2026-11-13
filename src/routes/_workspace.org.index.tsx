@@ -48,17 +48,17 @@ function Overview() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{person(me).name} · {ROLE_LABELS[role]}</p>
-          <h1 className="mt-1 text-3xl leading-tight sm:text-4xl">Overview</h1>
+          <h1 className="text-2xl leading-tight sm:text-[1.75rem]">Good to see you, {person(me).name.split(" ")[0]}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{ROLE_LABELS[role]} · here's where the team's work stands.</p>
         </div>
         <Button asChild><Link to="/org/reviews/new"><FilePlus2 /> New review request</Link></Button>
       </div>
 
-      <div className="grid grid-cols-2 border-l border-t border-border sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {pipeline.map((p) => (
-          <Link key={p.label} to={p.to} className="border-b border-r border-border bg-card p-4 transition-colors hover:bg-muted/50">
-            <div className="font-serif text-3xl">{p.n}</div>
-            <div className="mt-1 text-xs text-muted-foreground">{p.label}</div>
+          <Link key={p.label} to={p.to} className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)] transition-colors hover:bg-muted/40">
+            <div className="text-xs text-muted-foreground">{p.label}</div>
+            <div className="mt-1.5 text-[1.75rem] font-semibold leading-none tracking-tight tabular-nums">{p.n}</div>
           </Link>
         ))}
       </div>
@@ -256,7 +256,7 @@ function NewMilestone({ open, onOpenChange }: { open: boolean; onOpenChange: (op
             </div>
             <div className="grid gap-1.5">
               <Label htmlFor="ms-project">Project</Label>
-              <select id="ms-project" value={project} onChange={(e) => setProject(e.target.value)} className="h-11 border border-input bg-background px-2 text-sm md:h-9">
+              <select id="ms-project" value={project} onChange={(e) => setProject(e.target.value)} className="rounded-lg h-11 border border-input bg-background px-2 text-sm md:h-9">
                 <option value="">Any project</option>
                 {projects.data?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>

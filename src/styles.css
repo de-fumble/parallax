@@ -49,9 +49,11 @@
   --color-strong: var(--strong);
   --color-moderate: var(--moderate);
   --color-weak: var(--weak);
-  --font-serif: "Instrument Serif", Georgia, serif;
-  --font-sans: "Work Sans", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  /* One typeface family throughout: Geist for words, Geist Mono for code and figures.
+   * The display face is the same family, set heavier and tighter. */
+  --font-serif: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Geist", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -68,43 +70,48 @@
 }
 
 :root {
-  /* Monochrome and sharp-edged, after the Parallax mark: ink on paper. */
-  --radius: 0.125rem;
-  --background: oklch(0.992 0 0);
-  --foreground: oklch(0.24 0.004 350);
+  /* Quiet and precise: near-black ink on white, cool greys, soft corners.
+   * Colour is kept for meaning (evidence strength, status), never decoration. */
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.19 0.006 286);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.24 0.004 350);
+  --card-foreground: oklch(0.19 0.006 286);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.24 0.004 350);
-  --primary: oklch(0.24 0.004 350);
-  --primary-foreground: oklch(0.992 0 0);
-  --secondary: oklch(0.95 0 0);
-  --secondary-foreground: oklch(0.24 0.004 350);
-  --muted: oklch(0.962 0 0);
-  --muted-foreground: oklch(0.5 0 0);
-  --accent: oklch(0.24 0.004 350);
-  --accent-foreground: oklch(0.992 0 0);
-  --destructive: oklch(0.55 0.2 27);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.895 0 0);
-  --input: oklch(0.86 0 0);
-  --ring: oklch(0.24 0.004 350);
-  --strong: oklch(0.52 0.12 150);
-  --moderate: oklch(0.68 0.14 80);
-  --weak: oklch(0.58 0.18 30);
-  --chart-1: oklch(0.24 0.004 350);
-  --chart-2: oklch(0.52 0.12 150);
-  --chart-3: oklch(0.45 0.08 240);
-  --chart-4: oklch(0.68 0.14 80);
-  --chart-5: oklch(0.5 0.1 300);
-  --sidebar: oklch(0.975 0 0);
-  --sidebar-foreground: oklch(0.24 0.004 350);
-  --sidebar-primary: oklch(0.24 0.004 350);
-  --sidebar-primary-foreground: oklch(0.992 0 0);
-  --sidebar-accent: oklch(0.95 0 0);
-  --sidebar-accent-foreground: oklch(0.24 0.004 350);
-  --sidebar-border: oklch(0.895 0 0);
-  --sidebar-ring: oklch(0.24 0.004 350);
+  --popover-foreground: oklch(0.19 0.006 286);
+  --primary: oklch(0.19 0.006 286);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.967 0.002 286);
+  --secondary-foreground: oklch(0.19 0.006 286);
+  --muted: oklch(0.972 0.002 286);
+  --muted-foreground: oklch(0.54 0.012 286);
+  /* Hover and selected surfaces in menus and lists. */
+  --accent: oklch(0.962 0.003 286);
+  --accent-foreground: oklch(0.19 0.006 286);
+  --destructive: oklch(0.58 0.21 27);
+  --destructive-foreground: oklch(0.985 0 0);
+  --border: oklch(0.925 0.004 286);
+  --input: oklch(0.9 0.005 286);
+  --ring: oklch(0.55 0.012 286);
+  --strong: oklch(0.58 0.13 158);
+  --moderate: oklch(0.74 0.14 75);
+  --weak: oklch(0.6 0.19 27);
+  --chart-1: oklch(0.19 0.006 286);
+  --chart-2: oklch(0.58 0.13 158);
+  --chart-3: oklch(0.55 0.1 255);
+  --chart-4: oklch(0.74 0.14 75);
+  --chart-5: oklch(0.55 0.12 300);
+  --sidebar: oklch(0.984 0.0015 286);
+  --sidebar-foreground: oklch(0.19 0.006 286);
+  --sidebar-primary: oklch(0.19 0.006 286);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.952 0.003 286);
+  --sidebar-accent-foreground: oklch(0.19 0.006 286);
+  --sidebar-border: oklch(0.93 0.004 286);
+  --sidebar-ring: oklch(0.55 0.012 286);
+  /* Elevation: barely there. */
+  --shadow-soft: 0 1px 2px oklch(0.19 0.006 286 / 0.04), 0 1px 1px oklch(0.19 0.006 286 / 0.02);
+  --shadow-float: 0 12px 32px -12px oklch(0.19 0.006 286 / 0.18), 0 2px 6px oklch(0.19 0.006 286 / 0.05);
 }
 
 @layer base {
@@ -119,8 +126,17 @@
 }
 
 @layer base {
-  body { font-family: var(--font-sans); }
-  h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+  body {
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3 { font-family: var(--font-sans); font-weight: 600; letter-spacing: -0.025em; }
+  ::selection { background: oklch(0.19 0.006 286 / 0.12); }
+  /* Native selects round off like the fields beside them. */
+  select { border-radius: calc(var(--radius) - 2px); }
 }
 
 @utility cite-chip {
@@ -130,14 +146,34 @@
   margin-left: 0.1em;
   border-radius: 0.2rem;
   vertical-align: super;
-  background: color-mix(in oklch, var(--accent) 14%, transparent);
-  color: var(--accent);
+  background: color-mix(in oklch, var(--foreground) 7%, transparent);
+  color: var(--foreground);
   text-decoration: none;
 }
 
 @utility grid-paper {
   background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px);
   background-size: 32px 32px;
+}
+
+/* The display face is the same family as the text, set heavier and tighter. */
+.font-serif {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+/* Captions read as quiet labels in sentence case, not as stamped codes. */
+.font-mono.uppercase:not(kbd):not(.cite-chip) {
+  font-family: var(--font-sans);
+  text-transform: none;
+  letter-spacing: -0.005em;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* A surface that floats: menus, the command palette, the tour card. */
+.shadow-float {
+  box-shadow: var(--shadow-float);
 }
 
 /* ---------------------------------------------------------------------------
@@ -170,7 +206,7 @@ html {
 }
 
 @keyframes source-flash {
-  from { background-color: color-mix(in oklch, var(--accent) 18%, transparent); }
+  from { background-color: color-mix(in oklch, var(--foreground) 8%, transparent); }
   to { background-color: transparent; }
 }
 

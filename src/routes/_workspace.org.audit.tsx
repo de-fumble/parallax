@@ -59,7 +59,7 @@ function Audit() {
           {members.map((m) => <option key={m.user_id} value={m.user_id}>{m.full_name || m.email}</option>)}
         </select>
       </div>
-      <div className="overflow-x-auto border border-border bg-card">
+      <div className="rounded-xl overflow-x-auto border border-border bg-card">
         <table className="w-full min-w-[44rem] text-sm">
           <thead className="border-b border-border bg-muted/40 text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
             <tr>

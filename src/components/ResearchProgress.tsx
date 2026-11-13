@@ -29,7 +29,7 @@ function Step({ state, title, detail }: { state: StepState; title: string; detai
           state === "done"
             ? "border-strong bg-strong text-background"
             : state === "active"
-              ? "border-accent text-accent"
+              ? "border-foreground text-foreground"
               : state === "held"
                 ? "border-moderate bg-moderate/25 text-foreground"
                 : "border-border text-transparent"
@@ -59,10 +59,10 @@ export function ResearchProgress({ run }: { run: ActiveRun }) {
     <div
       role="status"
       aria-live="polite"
-      className="mt-8 overflow-hidden border border-border bg-card animate-in fade-in slide-in-from-bottom-2 duration-500"
+      className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-float)] animate-in fade-in slide-in-from-bottom-2 duration-500"
     >
-      <div className={`h-0.5 overflow-hidden ${held ? "bg-moderate/40" : "bg-accent/15"}`}>
-        {!held && <div className="indeterminate-bar h-full w-1/3 bg-accent" />}
+      <div className={`h-0.5 overflow-hidden ${held ? "bg-moderate/40" : "bg-foreground/10"}`}>
+        {!held && <div className="indeterminate-bar h-full w-1/3 bg-foreground" />}
       </div>
       <div className="space-y-6 p-4 sm:p-6">
         <div className="flex items-start justify-between gap-4">
@@ -70,7 +70,7 @@ export function ResearchProgress({ run }: { run: ActiveRun }) {
             <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
               {held ? "Research on hold" : "Research in progress"}
             </p>
-            <p className="mt-2 font-serif text-xl leading-snug [overflow-wrap:anywhere] sm:text-2xl">{run.input.topic}</p>
+            <p className="mt-1.5 text-lg font-semibold leading-snug tracking-tight [overflow-wrap:anywhere] sm:text-xl">{run.input.topic}</p>
           </div>
           <span className="shrink-0 font-mono text-sm tabular-nums text-muted-foreground">{clock(now - run.startedAt)}</span>
         </div>
@@ -104,7 +104,7 @@ export function ResearchProgress({ run }: { run: ActiveRun }) {
         </ol>
 
         {held && (
-          <div className="border border-moderate/50 bg-moderate/10 p-4 animate-in fade-in slide-in-from-bottom-1 duration-300">
+          <div className="rounded-xl border border-moderate/40 bg-moderate/[0.08] p-4 animate-in fade-in slide-in-from-bottom-1 duration-300">
             <p className="text-sm font-medium">The AI provider isn't responding right now.</p>
             <p className="mt-1 text-sm text-muted-foreground">
               Nothing is lost: your {sources.length} {sources.length === 1 ? "source is" : "sources are"} saved, so the search won't be

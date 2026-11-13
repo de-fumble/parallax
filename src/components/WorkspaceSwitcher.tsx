@@ -66,20 +66,20 @@ export function WorkspaceSwitcher({ onNavigate }: { onNavigate: () => void }) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <SidebarMenuButton size="lg" tooltip={`Workspace: ${name}`}>
-                <span className="flex size-8 shrink-0 items-center justify-center">
-                  <WorkspaceLogo className="h-5 max-w-8 w-auto" />
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-sidebar-border bg-background shadow-[var(--shadow-soft)]">
+                  <WorkspaceLogo className="h-4 max-w-6 w-auto" />
                 </span>
-                <span className="grid min-w-0 flex-1 leading-tight">
-                  <span className="truncate font-serif text-xl leading-none">{name}</span>
-                  <span className="truncate font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                    {org ? ROLE_LABELS[org.role] : "Personal workspace"}
+                <span className="grid min-w-0 flex-1 gap-0.5 leading-tight">
+                  <span className="truncate text-sm font-semibold tracking-tight text-foreground">{name}</span>
+                  <span className="truncate text-xs text-muted-foreground">
+                    {org ? ROLE_LABELS[org.role] : "Personal"}
                   </span>
                 </span>
-                <ChevronsUpDown className="ml-auto" />
+                <ChevronsUpDown className="ml-auto text-muted-foreground" />
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start" className="w-(--radix-dropdown-menu-trigger-width) min-w-64">
-              <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Workspaces</DropdownMenuLabel>
+              <DropdownMenuLabel className="text-xs font-medium text-muted-foreground">Workspaces</DropdownMenuLabel>
               <DropdownMenuItem onSelect={() => switchTo(null)}>
                 <User /> Personal
                 {!org && <Check className="ml-auto" />}

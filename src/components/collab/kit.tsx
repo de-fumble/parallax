@@ -96,7 +96,7 @@ export function Avatar({ id, size = "md" }: { id: string | null | undefined; siz
   const person = usePeople()(id);
   const dims = size === "sm" ? "size-5 text-[9px]" : size === "lg" ? "size-10 text-sm" : "size-7 text-[11px]";
   return (
-    <span title={person.name} className={`inline-flex shrink-0 items-center justify-center rounded-full border border-background bg-foreground font-mono text-background ${dims}`}>
+    <span title={person.name} className={`inline-flex shrink-0 items-center justify-center rounded-full bg-secondary font-medium text-foreground ring-2 ring-background ${dims}`}>
       {person.initials}
     </span>
   );
@@ -112,24 +112,26 @@ export function AvatarStack({ ids, size = "sm" }: { ids: (string | null)[]; size
   );
 }
 
+// Each status is a soft tinted pill with a dot of its colour.
 const STATUS_STYLE: Record<ReviewStatus | "draft", string> = {
-  draft: "border-border bg-muted text-muted-foreground",
-  in_review: "border-strong/40 bg-strong/10 text-strong",
-  changes_requested: "border-weak/40 bg-weak/10 text-weak",
-  filed: "border-foreground bg-foreground text-background",
-  closed: "border-border bg-background text-muted-foreground line-through",
+  draft: "bg-muted text-muted-foreground [--dot:var(--muted-foreground)]",
+  in_review: "bg-strong/10 text-strong [--dot:var(--strong)]",
+  changes_requested: "bg-moderate/15 text-foreground [--dot:var(--moderate)]",
+  filed: "bg-foreground text-background [--dot:var(--background)]",
+  closed: "bg-muted text-muted-foreground [--dot:var(--border)]",
 };
 
 export function StatusPill({ status }: { status: ReviewStatus | "draft" }) {
   return (
-    <span className={`inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${STATUS_STYLE[status]}`}>
+    <span className={`inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${STATUS_STYLE[status]}`}>
+      <span aria-hidden className="size-1.5 rounded-full bg-(--dot)" />
       {status === "draft" ? "Draft" : REVIEW_STATUS[status]}
     </span>
   );
 }
 
 export function LabelChip({ children }: { children: ReactNode }) {
-  return <span className="inline-flex items-center rounded-full border border-border px-2 py-0.5 text-[11px] text-muted-foreground">{children}</span>;
+  return <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground">{children}</span>;
 }
 
 export function UrgencyChip({ urgency }: { urgency: string }) {
@@ -140,9 +142,9 @@ export function UrgencyChip({ urgency }: { urgency: string }) {
 
 export function Panel({ title, action, children }: { title: ReactNode; action?: ReactNode; children: ReactNode }) {
   return (
-    <section className="border border-border bg-card">
-      <header className="flex items-center justify-between gap-3 border-b border-border px-4 py-2.5">
-        <div className="flex min-w-0 items-center gap-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{title}</div>
+    <section className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-soft)]">
+      <header className="flex min-h-11 items-center justify-between gap-3 border-b border-border/70 px-4 py-2.5">
+        <div className="flex min-w-0 items-center gap-2 text-[13px] font-medium text-foreground">{title}</div>
         {action}
       </header>
       {children}
@@ -154,8 +156,8 @@ export function PageTitle({ title, sub, actions }: { title: ReactNode; sub?: Rea
   return (
     <div data-page-title className="flex flex-wrap items-end justify-between gap-4">
       <div className="min-w-0">
-        <h1 className="flex flex-wrap items-center gap-2 text-3xl leading-tight [overflow-wrap:anywhere] sm:text-4xl">{title}</h1>
-        {sub && <p className="mt-1.5 text-sm text-muted-foreground">{sub}</p>}
+        <h1 className="flex flex-wrap items-center gap-2 text-2xl leading-tight [overflow-wrap:anywhere] sm:text-[1.75rem]">{title}</h1>
+        {sub && <p className="mt-1 max-w-2xl text-sm text-muted-foreground">{sub}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -163,11 +165,11 @@ export function PageTitle({ title, sub, actions }: { title: ReactNode; sub?: Rea
 }
 
 export function Empty({ children }: { children: ReactNode }) {
-  return <p className="px-4 py-8 text-center text-sm text-muted-foreground">{children}</p>;
+  return <p className="mx-auto max-w-sm px-4 py-12 text-center text-sm leading-relaxed text-muted-foreground">{children}</p>;
 }
 
 export function LoadError({ error }: { error: Error }) {
-  return <p className="border border-weak/40 bg-weak/5 p-4 text-sm">{error.message}</p>;
+  return <p className="rounded-xl border border-weak/30 bg-weak/5 p-4 text-sm">{error.message}</p>;
 }
 
-export const selectClass = "h-11 border border-input bg-background px-2 text-sm md:h-9";
+export const selectClass = "h-11 rounded-lg border border-input bg-background px-3 text-sm shadow-[var(--shadow-soft)] md:h-9";

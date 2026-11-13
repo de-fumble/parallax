@@ -109,11 +109,11 @@ export function BrandingSettings() {
                     setPrimary(p.primary);
                     setSecondary(p.secondary);
                   }}
-                  className="flex items-center gap-2 border border-border px-2.5 py-1.5 text-xs hover:bg-muted"
+                  className="rounded-lg flex items-center gap-2 border border-border px-2.5 py-1.5 text-xs hover:bg-muted"
                 >
                   <span className="flex">
-                    <span className="size-4 border border-border" style={{ background: p.primary }} />
-                    <span className="size-4 border border-l-0 border-border" style={{ background: p.secondary }} />
+                    <span className="rounded-xl size-4 border border-border" style={{ background: p.primary }} />
+                    <span className="rounded-xl size-4 border border-l-0 border-border" style={{ background: p.secondary }} />
                   </span>
                   {p.name}
                 </button>
@@ -186,7 +186,7 @@ function ColourField({ label, value, onChange, disabled }: { label: string; valu
           value={isHex(value) ? value : "#000000"}
           disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
-          className="h-11 w-14 shrink-0 cursor-pointer border border-input bg-background p-1 disabled:cursor-default md:h-9"
+          className="rounded-lg h-11 w-14 shrink-0 cursor-pointer border border-input bg-background p-1 disabled:cursor-default md:h-9"
         />
         <Input id={id} value={value} disabled={disabled} onChange={(e) => onChange(e.target.value.trim())} className="font-mono" maxLength={7} spellCheck={false} />
       </div>
@@ -198,7 +198,7 @@ function ColourField({ label, value, onChange, disabled }: { label: string; valu
 // CSS variables, so setting them on this box restyles everything inside it.
 function ThemePreview({ primary, secondary, logo }: { primary: string; secondary: string; logo: string | null }) {
   return (
-    <div style={themeVariables(primary, secondary) as React.CSSProperties} className="grid overflow-hidden border border-border sm:grid-cols-[11rem_1fr]" aria-label="Preview">
+    <div style={themeVariables(primary, secondary) as React.CSSProperties} className="rounded-xl grid overflow-hidden border border-border sm:grid-cols-[11rem_1fr]" aria-label="Preview">
       <div className="space-y-1 bg-sidebar p-3 text-sm text-sidebar-foreground">
         <div className="mb-3 flex items-center gap-2">
           {logo ? <img src={logo} alt="" className="h-5 max-w-8 object-contain" /> : <ParallaxMark className="h-5 w-auto" />}
@@ -235,7 +235,7 @@ function PrintPreview({ image, primary, secondary }: { image: string | null; pri
   return (
     <section className="space-y-2">
       <h3 className="font-sans text-sm font-medium">How printed documents look</h3>
-      <div className="max-w-md border border-border bg-white p-6 text-[#231f20] shadow-sm">
+      <div className="rounded-xl max-w-md border border-border bg-white p-6 text-[#231f20] shadow-sm">
         {logo.isPending ? (
           <Skeleton className="h-14 w-24" />
         ) : logo.isError ? (
@@ -280,7 +280,7 @@ function ImageField({ kind, label, hint, path, disabled, onChange }: {
   return (
     <div className="space-y-2">
       <div className="text-sm font-medium">{label}</div>
-      <div className="flex h-24 items-center justify-center border border-dashed border-border bg-muted/30 p-3">
+      <div className="rounded-xl flex h-24 items-center justify-center border border-dashed border-border bg-muted/30 p-3">
         {uploading ? <Loader2 className="size-5 animate-spin text-muted-foreground" /> : url ? <img src={url} alt={label} className="max-h-full max-w-full object-contain" /> : <span className="text-xs text-muted-foreground">Parallax's</span>}
       </div>
       {!disabled && (

@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Check, ChevronsUpDown, Clock, Compass, FileText, GitPullRequest, History, Home, Loader2, LogOut, Pause, Plus, Search, Users } from "lucide-react";
+import { Check, ChevronsUpDown, Clock, Compass, FileText, GitPullRequest, History, Home, Loader2, LogOut, Pause, Plus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
@@ -34,7 +34,7 @@ import {
 
 const RECENT_LIMIT = 8;
 
-export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
+export function WorkspaceSidebar() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
@@ -63,19 +63,12 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
                 <SidebarMenuButton
                   asChild
                   tooltip="New research"
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground active:bg-primary/90 active:text-primary-foreground"
+                  className="mb-2 h-9 justify-center bg-primary font-medium text-primary-foreground shadow-[var(--shadow-soft)] hover:bg-primary/85 hover:text-primary-foreground active:bg-primary/85 active:text-primary-foreground group-data-[collapsible=icon]:justify-start"
                 >
                   <Link to="/research" onClick={close}>
                     <Plus />
                     <span>New research</span>
                   </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem data-tour="search">
-                <SidebarMenuButton tooltip="Search" onClick={() => { close(); onSearch(); }}>
-                  <Search />
-                  <span>Search</span>
-                  <kbd className="ml-auto hidden font-mono text-[10px] text-muted-foreground md:inline">⌘K</kbd>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem data-tour="history">
@@ -84,27 +77,17 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
                     <History />
                     <span>History</span>
                     {reports.data && reports.data.length > 0 && (
-                      <span className="ml-auto font-mono text-[10px] text-muted-foreground">{reports.data.length}</span>
+                      <span className="ml-auto text-xs tabular-nums text-muted-foreground">{reports.data.length}</span>
                     )}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
               {org && (
                 <SidebarMenuItem data-tour="collab">
-                  <SidebarMenuButton asChild tooltip="Collaboration" isActive={pathname === "/org" || pathname.startsWith("/org/")}>
+                  <SidebarMenuButton asChild tooltip="Team" isActive={pathname === "/org" || pathname.startsWith("/org/") || pathname === "/organization"}>
                     <Link to="/org" onClick={close}>
                       <GitPullRequest />
-                      <span>Collaboration</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              )}
-              {org && (
-                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Organization" isActive={pathname === "/organization"}>
-                    <Link to="/organization" onClick={close}>
-                      <Users />
-                      <span>Members</span>
+                      <span>Team</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -115,7 +98,7 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
 
         {run.status !== "idle" && run.status !== "error" && (
           <SidebarGroup>
-            <SidebarGroupLabel>Now</SidebarGroupLabel>
+            <SidebarGroupLabel>In progress</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem>
@@ -155,7 +138,7 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
         )}
 
         <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel>{org ? "Recent in this organization" : "Recent reports"}</SidebarGroupLabel>
+          <SidebarGroupLabel>Recent</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {reports.isPending && [0, 1, 2].map((i) => <SidebarMenuSkeleton key={i} />)}
@@ -189,27 +172,24 @@ export function WorkspaceSidebar({ onSearch }: { onSearch: () => void }) {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Take the tour" onClick={() => { close(); tour.start(); }}>
-              <Compass />
-              <span>Take the tour</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" tooltip={email || "Account"}>
-                  <span className="flex size-8 shrink-0 items-center justify-center bg-primary font-mono text-xs uppercase text-primary-foreground">
+                  <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-xs font-semibold uppercase text-foreground">
                     {email.slice(0, 1) || "·"}
                   </span>
-                  <span className="truncate text-sm">{email}</span>
-                  <ChevronsUpDown className="ml-auto" />
+                  <span className="truncate text-[13px] text-muted-foreground">{email}</span>
+                  <ChevronsUpDown className="ml-auto text-muted-foreground" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" align="start" className="w-(--radix-dropdown-menu-trigger-width) min-w-52">
                 <DropdownMenuLabel className="truncate font-normal text-muted-foreground">{email}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                <DropdownMenuItem onSelect={() => { close(); tour.start(); }}>
+                  <Compass /> Take the tour
+                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => { close(); navigate({ to: "/" }); }}>
-                  <Home /> Parallax home page
+                  <Home /> Home page
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onSelect={async () => {

@@ -39,7 +39,7 @@ function Board() {
       <PageTitle title="Research board" sub="Every piece of work from draft to filed. Cards move on their own as work is submitted, reviewed and filed." />
       <div className="-mx-4 flex snap-x gap-3 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
         {columns.map((col) => (
-          <section key={col.title} className="flex w-72 shrink-0 snap-start flex-col border border-border bg-muted/30">
+          <section key={col.title} className="rounded-xl flex w-72 shrink-0 snap-start flex-col border border-border bg-muted/30">
             <header className="flex items-center justify-between border-b border-border px-3 py-2">
               <span className="text-sm font-medium">{col.title}</span>
               <span className="rounded-full bg-background px-2 font-mono text-[10px]">{col.cards.length}</span>
@@ -49,7 +49,7 @@ function Board() {
                 <li key={c.key}>
                   <Link
                     {...("draftId" in c.to ? { to: "/org/drafts/$draftId" as const, params: c.to } : { to: "/org/reviews/$number" as const, params: c.to })}
-                    className="block border border-border bg-card p-3 shadow-sm transition-colors hover:border-foreground/40"
+                    className="rounded-xl block border border-border bg-card p-3 shadow-sm transition-colors hover:border-foreground/40"
                   >
                     <div className="text-sm font-medium leading-snug">{c.title}</div>
                     <div className="mt-1 text-xs text-muted-foreground">{projects.data?.find((p) => p.id === c.projectId)?.name} · {c.note}</div>

@@ -37,7 +37,7 @@ export function SectionDiffView({
           <label className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <input type="checkbox" className="size-4" checked={showSame} onChange={(e) => setShowSame(e.target.checked)} /> Show unchanged sections
           </label>
-          <div className="flex border border-border">
+          <div className="rounded-lg overflow-hidden flex border border-border">
             {(["changes", "result"] as const).map((v) => (
               <button key={v} type="button" onClick={() => setView(v)} className={`px-3 py-1.5 text-xs ${view === v ? "bg-foreground text-background" : "text-muted-foreground"}`}>
                 {v === "changes" ? "Show changes" : "Show result"}
@@ -46,9 +46,9 @@ export function SectionDiffView({
           </div>
         </div>
       </div>
-      {shown.length === 0 && <p className="border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No sections changed.</p>}
+      {shown.length === 0 && <p className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">No sections changed.</p>}
       {shown.map((s) => (
-        <section key={s.title} id={`diff-${s.title}`} className="border border-border bg-card">
+        <section key={s.title} id={`diff-${s.title}`} className="rounded-xl border border-border bg-card">
           <header className="flex flex-wrap items-center gap-2 border-b border-border bg-muted/40 px-3 py-2 text-sm">
             <span className="font-medium">{s.title}</span>
             <span className={`text-xs ${s.kind === "added" ? "text-strong" : s.kind === "removed" ? "text-weak" : "text-muted-foreground"}`}>{KIND_LABEL[s.kind]}</span>

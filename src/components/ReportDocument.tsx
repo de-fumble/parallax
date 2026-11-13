@@ -55,7 +55,7 @@ const qualityClass: Record<string, string> = {
 };
 
 function Tag({ children, tone }: { children: ReactNode; tone?: string }) {
-  return <span className={`rounded px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider ${tone ? qualityClass[tone] ?? "bg-muted" : "bg-muted text-muted-foreground"}`}>{children}</span>;
+  return <span className={`rounded-full px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider ${tone ? qualityClass[tone] ?? "bg-muted" : "bg-muted text-muted-foreground"}`}>{children}</span>;
 }
 
 /** A piece of report text: plain (with citation chips) when reading, a field when editing. */
@@ -83,7 +83,7 @@ function Text({
       onChange={(e) => onChange(e.target.value)}
       // Grows with its content, so the field is always the size of the text.
       style={{ fieldSizing: "content" } as React.CSSProperties}
-      className={`block w-full resize-none border border-input bg-background px-2 py-1.5 outline-none transition-colors focus:border-foreground ${className}`}
+      className={`block w-full resize-none rounded-lg border border-input bg-background px-2.5 py-1.5 outline-none transition-[border-color,box-shadow] focus:border-ring/60 focus:ring-[3px] focus:ring-ring/15 ${className}`}
     />
   );
 }
@@ -151,8 +151,8 @@ function SectionFrame({
         editor ? "border border-dashed border-border p-3 sm:p-4" : onEditRequest ? "editable-region" : ""
       }`}
     >
-      <div className="flex items-center justify-between gap-3 border-b border-border/70 pb-3">
-        <h2 className="min-w-0 font-serif text-2xl lg:text-3xl tracking-tight text-foreground">{title}</h2>
+      <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-3">
+        <h2 className="min-w-0 text-xl tracking-tight text-foreground lg:text-[1.375rem]">{title}</h2>
         {editor ? (
           <div className="flex shrink-0 items-center gap-0.5 print:hidden">
             <Button type="button" variant="ghost" size="icon" className="size-10 md:size-8" disabled={position === 0} aria-label={`Move ${title} up`} onClick={() => editor.move(sectionKey, -1)}>
@@ -205,7 +205,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
         {(r.template_sections ?? []).map((s, i) => (
           <div key={i} className="border-b border-border/40 pb-8 last:border-b-0 last:pb-0">
             <div className="flex items-start gap-2">
-              <h3 className="min-w-0 flex-1 font-serif text-xl lg:text-2xl text-foreground font-normal">
+              <h3 className="min-w-0 flex-1 text-lg leading-snug text-foreground lg:text-xl">
                 <Text editing={editing} cite={false} value={s.title} label={`Section ${i + 1} title`} onChange={(v) => update((d) => { d.template_sections![i]!.title = v; })} />
               </h3>
               {editing && <RemoveButton label={`Remove section ${i + 1}`} onClick={() => update((d) => { d.template_sections!.splice(i, 1); })} />}
@@ -252,7 +252,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
     subtopics: () => (
       <div className="grid gap-4 md:grid-cols-2">
         {r.subtopics.map((s, i) => (
-          <div key={i} className="rounded-md border border-border bg-card p-4">
+          <div key={i} className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-soft)]">
             <div className="flex items-start gap-1">
               <h3 className="min-w-0 flex-1 text-lg">
                 <Text editing={editing} cite={false} value={s.subtopic} label={`Subtopic ${i + 1} title`} onChange={(v) => update((d) => { d.subtopics[i]!.subtopic = v; })} />
@@ -272,7 +272,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
         {r.comparison.criteria.length > 0 && <p className="mb-4 text-sm text-muted-foreground">Criteria: {r.comparison.criteria.join(" · ")}</p>}
         <div className="grid gap-4 md:grid-cols-2">
           {r.comparison.options.map((o, i) => (
-            <div key={i} className="rounded-md border border-border bg-card p-4 text-sm">
+            <div key={i} className="rounded-xl border border-border bg-card p-4 text-sm shadow-[var(--shadow-soft)]">
               <div className="flex items-start gap-1">
                 <h3 className="min-w-0 flex-1 text-xl">
                   <Text editing={editing} cite={false} value={o.option} label={`Option ${i + 1} name`} onChange={(v) => update((d) => { d.comparison.options[i]!.option = v; })} />
@@ -297,7 +297,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
     contradictions: () => (
       <div className="space-y-4">
         {r.contradictions.map((c, i) => (
-          <div key={i} className="rounded-md border border-border p-4 text-sm">
+          <div key={i} className="rounded-xl border border-border p-4 text-sm">
             <div className="flex items-start gap-1">
               <div className="min-w-0 flex-1 font-medium">
                 <Text editing={editing} cite={false} value={c.issue} label={`Contradiction ${i + 1} issue`} onChange={(v) => update((d) => { d.contradictions[i]!.issue = v; })} />
@@ -359,7 +359,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
       <ol className="space-y-3 text-sm">
         {r.sources_used.map((s) => (
           <li key={s.source_id} id={`src-${s.source_id}`} className="source-row grid scroll-mt-28 grid-cols-[3rem_1fr] gap-2">
-            <span className="font-mono text-accent">{s.source_id}</span>
+            <span className="font-mono text-foreground">{s.source_id}</span>
             <div>
               {s.url ? <a href={s.url} target="_blank" rel="noreferrer" className="font-medium underline decoration-border underline-offset-2 hover:decoration-accent">{s.title}</a> : <span className="font-medium">{s.title}</span>}
               <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
@@ -381,7 +381,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
       <div
         id="section-summary"
         onClick={onEditRequest ? (e) => requestEdit(e, () => onEditRequest("summary")) : undefined}
-        className={`group/section mt-6 sm:mt-8 lg:mt-10 scroll-mt-28 ${editing ? "border border-dashed border-border p-3 sm:p-4" : onEditRequest ? "editable-region" : ""}`}
+        className={`rounded-xl group/section mt-6 sm:mt-8 lg:mt-10 scroll-mt-28 ${editing ? "rounded-xl border border-dashed border-border p-3 sm:p-4" : onEditRequest ? "editable-region" : ""}`}
       >
         <div className="flex flex-wrap items-center gap-2">
           <Tag>{r.mode}</Tag>
@@ -390,14 +390,14 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
           <span className="font-mono text-xs text-muted-foreground ml-1">{new Date(createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}</span>
           {!editing && onEditRequest && <span className="ml-auto"><EditHint /></span>}
         </div>
-        <h1 className="mt-5 font-serif text-3xl leading-[1.12] sm:text-4xl md:text-5xl lg:text-6xl tracking-tight text-foreground">
+        <h1 className="mt-4 text-[1.875rem] leading-[1.1] tracking-[-0.03em] text-foreground sm:text-4xl lg:text-5xl">
           <Text editing={editing} cite={false} value={r.research_title} label="Report title" onChange={(v) => update((d) => { d.research_title = v; })} />
         </h1>
         <p className="mt-3 text-sm sm:text-base lg:text-lg text-muted-foreground font-light leading-relaxed max-w-3xl">{topic}</p>
 
-        <div className="mt-10 lg:mt-12 border-l-2 border-foreground pl-6 lg:pl-8 py-2 bg-muted/20 rounded-r-md">
-          <div className="font-mono text-[10px] uppercase tracking-widest text-foreground font-semibold">Bottom line // Synthesis</div>
-          <div className="mt-3 font-serif text-xl lg:text-2xl leading-relaxed text-foreground">
+        <div className="mt-10 rounded-2xl bg-muted/60 px-5 py-5 sm:px-7 sm:py-6 lg:mt-12">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Bottom line</div>
+          <div className="mt-2 text-lg font-medium leading-relaxed tracking-[-0.01em] text-foreground lg:text-xl">
             <Text editing={editing} value={r.bottom_line} label="Bottom line" onChange={(v) => update((d) => { d.bottom_line = v; })} />
           </div>
           <div className="mt-3 text-xs lg:text-sm text-muted-foreground font-mono">
@@ -406,7 +406,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
         </div>
 
         {(r.warnings?.length > 0 || editing) && (
-          <div className="mt-8 rounded-md border border-weak/40 bg-weak/5 p-4 text-sm">
+          <div className="mt-8 rounded-xl border border-weak/30 bg-weak/5 p-4 text-sm">
             <div className="mb-2 font-mono text-xs uppercase text-weak">Warnings</div>
             <List editing={editing} items={r.warnings ?? []} label="Warning" onChange={(v) => update((d) => { d.warnings = v; })} />
           </div>
@@ -422,7 +422,7 @@ export function ReportDocument({ report: r, topic, createdAt, layout, hidden, ed
       </div>
 
       {restorable.length > 0 && (
-        <div className="mt-10 border border-dashed border-border p-4 print:hidden">
+        <div className="mt-10 rounded-xl border border-dashed border-border p-4 print:hidden">
           <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Hidden sections</div>
           <p className="mt-1 text-xs text-muted-foreground">Left out of the page, the print-out and every export. Nothing is deleted.</p>
           <div className="mt-3 flex flex-wrap gap-2">

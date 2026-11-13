@@ -162,7 +162,7 @@ function ProjectPage() {
                       {person(d.author_id).name} · closed {timeAgo(d.closed_at ?? d.updated_at)}{d.closed_reason ? `: “${d.closed_reason}”` : ""}
                     </div>
                   </div>
-                  <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider">Closed</span>
+                  <span className="rounded-md border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider">Closed</span>
                 </Link>
               </li>
             ))}

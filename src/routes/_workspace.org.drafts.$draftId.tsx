@@ -82,7 +82,7 @@ function DraftPage() {
   }, [dirty]);
 
   if (query.isPending) return <Skeleton className="h-64" />;
-  if (query.isError) return <p className="border border-weak/40 bg-weak/5 p-4 text-sm">{query.error.message}</p>;
+  if (query.isError) return <p className="rounded-xl border border-weak/40 bg-weak/5 p-4 text-sm">{query.error.message}</p>;
   if (!data) return <p>This draft doesn't exist or you don't have access to it.</p>;
 
   const { draft, revisions, base, review, closeRequest } = data;
@@ -173,7 +173,7 @@ function DraftPage() {
       />
 
       {draft.status === "filed" && (
-        <div className="flex flex-wrap items-center justify-between gap-3 border border-border bg-muted/40 p-3 text-sm">
+        <div className="rounded-xl flex flex-wrap items-center justify-between gap-3 border border-border bg-muted/40 p-3 text-sm">
           <span>This draft is filed: it is now part of the document's history and can no longer change.</span>
           <div className="flex items-center gap-2">
             {doc && (
@@ -194,7 +194,7 @@ function DraftPage() {
         </div>
       )}
       {draft.status === "closed" && (
-        <p className="border border-border bg-muted/40 p-3 text-sm">
+        <p className="rounded-xl border border-border bg-muted/40 p-3 text-sm">
           {draft.closed_by ? `${person(draft.closed_by).name} closed this draft` : "This draft is closed"}
           {draft.closed_at ? ` ${timeAgo(draft.closed_at)}` : ""}
           {draft.closed_reason ? `: “${draft.closed_reason}”` : ""}. It is kept under Closed drafts and can't change unless it is reopened.
@@ -202,12 +202,12 @@ function DraftPage() {
       )}
       {!finished && <CloseRequestBanner request={closeRequest} />}
       {editable && inReview && (
-        <p className="border border-moderate/50 bg-moderate/10 p-3 text-sm">
+        <p className="rounded-xl border border-moderate/50 bg-moderate/10 p-3 text-sm">
           This draft is in review. Saving a change sends review #{review!.number} back to the first approval stage, because earlier approvals were for different wording.
         </p>
       )}
 
-      <div className="flex border border-border">
+      <div className="rounded-lg overflow-hidden flex border border-border">
         {(["edit", "compare"] as const).map((v) => (
           <button key={v} type="button" onClick={() => setView(v)} className={`flex-1 px-3 py-2 text-sm ${view === v ? "bg-foreground text-background" : "text-muted-foreground"}`}>
             {v === "edit" ? (editable ? "Edit" : "Read") : draft.base_version ? `Compare with version ${draft.base_version}` : "Compare with the start"}
@@ -222,7 +222,7 @@ function DraftPage() {
           ) : (
             <>
               {sections.map((s, i) => (
-                <section key={i} className="border border-border bg-card">
+                <section key={i} className="rounded-xl border border-border bg-card">
                   <header className="flex items-center gap-2 border-b border-border px-3 py-2">
                     {editable ? (
                       <Input aria-label={`Section ${i + 1} title`} value={s.title} onChange={(e) => update(i, { title: e.target.value })} className="h-9 border-0 px-1 font-medium shadow-none focus-visible:ring-0 md:h-8" placeholder="Section title" />
@@ -328,7 +328,7 @@ function CloseRequestBanner({ request }: { request: CloseRequest | null }) {
 
   if (request.status === "declined" && request.requested_by === me) {
     return (
-      <p className="border border-border bg-muted/40 p-3 text-sm">
+      <p className="rounded-xl border border-border bg-muted/40 p-3 text-sm">
         {request.decided_by ? person(request.decided_by).name : "A manager"} kept this draft open {request.decided_at ? timeAgo(request.decided_at) : ""}
         {request.note ? `: “${request.note}”` : "."}
       </p>
@@ -345,7 +345,7 @@ function CloseRequestBanner({ request }: { request: CloseRequest | null }) {
   };
 
   return (
-    <div className="space-y-3 border border-moderate/50 bg-moderate/10 p-3 text-sm">
+    <div className="rounded-xl space-y-3 border border-moderate/50 bg-moderate/10 p-3 text-sm">
       <p>
         <span className="font-medium">{mine ? "You asked" : `${asker} asks`} to close this draft</span>{" "}
         <span className="text-muted-foreground">{timeAgo(request.created_at)}</span>: “{request.reason}”
@@ -536,14 +536,14 @@ function ImportReport({ onClose, onAdd }: { onClose: () => void; onAdd: (section
           <DialogTitle>Add from a report</DialogTitle>
           <DialogDescription>Sections with the same title as one in your draft are added to the end of it; the rest become new sections. Citations stay as written.</DialogDescription>
         </DialogHeader>
-        <select aria-label="Report" value={reportId} onChange={(e) => void choose(e.target.value)} className="h-11 border border-input bg-background px-2 text-sm md:h-9">
+        <select aria-label="Report" value={reportId} onChange={(e) => void choose(e.target.value)} className="rounded-lg h-11 border border-input bg-background px-2 text-sm md:h-9">
           <option value="">Choose a report…</option>
           {reports.data?.map((r) => <option key={r.id} value={r.id}>{(r.title || r.topic).slice(0, 80)}</option>)}
         </select>
         {reports.data?.length === 0 && <p className="text-sm text-muted-foreground">No reports have been researched in this organization yet.</p>}
         {loading && <Skeleton className="h-24" />}
         {sections.length > 0 && (
-          <ul className="max-h-72 divide-y divide-border overflow-y-auto border border-border">
+          <ul className="rounded-xl max-h-72 divide-y divide-border overflow-y-auto border border-border">
             {sections.map((s) => (
               <li key={s.title}>
                 <label className="flex items-start gap-3 px-3 py-2.5 text-sm">

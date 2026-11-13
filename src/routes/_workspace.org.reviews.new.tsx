@@ -110,7 +110,7 @@ function NewRequest() {
     return (
       <div className="mx-auto max-w-3xl space-y-6">
         <PageTitle title="New review request" />
-        <div className="border border-dashed border-border">
+        <div className="rounded-xl border border-dashed border-border">
           <Empty>
             A review request proposes one of your drafts for filing. You have no open drafts:{" "}
             <Link to="/org/projects" className="underline">open a project</Link> and start a new document, or start a draft from a filed one.
@@ -138,7 +138,7 @@ function NewRequest() {
           <div className="grid gap-2 sm:grid-cols-4">
             {KINDS.map((k) => (
               <button key={k} type="button" role="radio" aria-checked={kind === k} onClick={() => setKind(k)}
-                className={`border px-3 py-2.5 text-left text-sm transition-colors ${kind === k ? "border-foreground bg-muted" : "border-border hover:bg-muted/50"}`}>
+                className={`rounded-xl border px-3 py-2.5 text-left text-sm transition-colors ${kind === k ? "border-foreground bg-muted" : "border-border hover:bg-muted/50"}`}>
                 {k}
               </button>
             ))}
@@ -174,7 +174,7 @@ function NewRequest() {
 
         <div className="space-y-2">
           <Label htmlFor="nr-files">Attachments</Label>
-          <label htmlFor="nr-files" className="flex cursor-pointer flex-col items-center gap-1 border border-dashed border-border p-6 text-sm text-muted-foreground hover:bg-muted/40">
+          <label htmlFor="nr-files" className="rounded-xl flex cursor-pointer flex-col items-center gap-1 border border-dashed border-border p-6 text-sm text-muted-foreground hover:bg-muted/40">
             <Upload className="size-5" /> Documents, images or data files, up to {MAX_ATTACHMENT_BYTES / 1024 / 1024} MB each
           </label>
           <input
@@ -201,7 +201,7 @@ function NewRequest() {
         <div className="grid gap-4 sm:grid-cols-2">
           <fieldset className="space-y-2">
             <legend className="text-sm font-medium">Urgency</legend>
-            <div className="flex border border-border">
+            <div className="rounded-lg overflow-hidden flex border border-border">
               {URGENCY.map((u) => (
                 <button key={u} type="button" role="radio" aria-checked={urgency === u} onClick={() => setUrgency(u)}
                   className={`flex-1 py-2 text-sm ${urgency === u ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}>{u}</button>

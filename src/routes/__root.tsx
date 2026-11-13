@@ -74,7 +74,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
         {import.meta.env.DEV && (
-          <pre className="mt-4 max-h-40 overflow-auto whitespace-pre-wrap border border-border bg-muted p-3 text-left font-mono text-xs text-muted-foreground">
+          <pre className="rounded-xl mt-4 max-h-40 overflow-auto whitespace-pre-wrap border border-border bg-muted p-3 text-left font-mono text-xs text-muted-foreground">
             {message}
           </pre>
         )}
@@ -107,7 +107,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       // viewport-fit=cover lets the page use the whole screen on notched phones;
       // bars at the edges then pad themselves with the safe-area insets.
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { name: "theme-color", content: "#fcfcfc" },
+      { name: "theme-color", content: "#ffffff" },
       { title: "Parallax" },
       { name: "description", content: "Evidence-linked research reports." },
       { property: "og:title", content: "Parallax" },
@@ -120,7 +120,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Work+Sans:wght@400;500;600&display=swap",
+        href: "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap",
       },
       {
         rel: "stylesheet",

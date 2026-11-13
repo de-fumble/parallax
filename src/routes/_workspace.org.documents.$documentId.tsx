@@ -35,7 +35,7 @@ function DocumentPage() {
   const [downloading, setDownloading] = useState<string | null>(null);
 
   if (query.isPending) return <Skeleton className="h-64" />;
-  if (query.isError) return <p className="border border-weak/40 bg-weak/5 p-4 text-sm">{query.error.message}</p>;
+  if (query.isError) return <p className="rounded-xl border border-weak/40 bg-weak/5 p-4 text-sm">{query.error.message}</p>;
   const { doc, versions, owners } = query.data;
   if (!doc) return <p>This document doesn't exist or you don't have access to it.</p>;
 
@@ -211,7 +211,7 @@ function OwnersDialog({ section, current, onClose, onSave }: { documentId: strin
           <DialogTitle>Owners of "{section}"</DialogTitle>
           <DialogDescription>Owners are told whenever a review request changes this section.</DialogDescription>
         </DialogHeader>
-        <ul className="max-h-72 divide-y divide-border overflow-y-auto border border-border">
+        <ul className="rounded-xl max-h-72 divide-y divide-border overflow-y-auto border border-border">
           {members.map((m) => (
             <li key={m.user_id}>
               <label className="flex items-center gap-3 px-3 py-2.5 text-sm">

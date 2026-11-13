@@ -41,7 +41,7 @@ function Projects() {
       ) : projects.isError ? (
         <LoadError error={projects.error} />
       ) : shown.length === 0 ? (
-        <div className="border border-dashed border-border">
+        <div className="rounded-xl border border-dashed border-border">
           <Empty>
             {projects.data.length === 0
               ? "No projects yet. Create the first one to start organizing the department's research."

@@ -63,8 +63,8 @@ function buildSteps({ orgName, role, latestReport, hasProjects }: Context): Step
       title: "1. Ask a question",
       body: (
         <>
-          Write the topic or question, and add context if it helps: who the report is for, a place, a timeframe or a goal. Press
-          <kbd className="mx-1 border border-border px-1 font-mono text-[11px]">⌘ Enter</kbd> to start from anywhere on the form.
+          Type your question here. Use Context in the toolbar to say who it's for, a place, a timeframe or a goal. Press
+          <kbd className="rounded-md mx-1 border border-border px-1 font-mono text-[11px]">⌘ Enter</kbd> to run it.
         </>
       ),
     },
@@ -75,8 +75,8 @@ function buildSteps({ orgName, role, latestReport, hasProjects }: Context): Step
       title: "2. Choose the sources",
       body: (
         <>
-          Parallax searches the web by default. You can also upload your own documents (PDF, Word, Markdown or text, up to 20 of them) or
-          paste text. Turn web search off to research only what you provide.
+          Web search is on by default. Add your own documents with Files (PDF, Word, Markdown or text, up to 20), or Paste text. Switch Web
+          off to research only what you provide; you can also drop files straight onto the box.
         </>
       ),
     },
@@ -85,7 +85,7 @@ function buildSteps({ orgName, role, latestReport, hasProjects }: Context): Step
       path: "/research",
       target: '[data-tour="depth"]',
       title: "3. Pick a depth",
-      body: <>Light is quick and reads a few sources. Medium is the everyday choice. Deep reads the most sources and writes the longest report, so it takes longer.</>,
+      body: <>Light is a quick scan. Medium is the everyday choice. Deep reads the most sources and writes the fullest report, so it takes longer.</>,
     },
     // The research page only offers this inside an organization that has projects.
     ...(!inOrg || !hasProjects ? [] : [{
@@ -94,7 +94,7 @@ function buildSteps({ orgName, role, latestReport, hasProjects }: Context): Step
       target: '[data-tour="draft-target"]',
       optional: true,
       title: "Research straight into a project",
-      body: <>Choose a project here and the finished report arrives as a draft in it, ready to edit and send for review, instead of as a standalone report.</>,
+      body: <>Pick a project under Options and the finished report arrives as a draft there, ready to edit and send for review.</>,
     }]),
     {
       id: "run",
@@ -103,8 +103,8 @@ function buildSteps({ orgName, role, latestReport, hasProjects }: Context): Step
       title: "4. Run it",
       body: (
         <>
-          This shows where the report will be saved and how many sources it can use. Once it's running you can leave the page: progress
-          shows in the sidebar, and if the AI provider has a hiccup Parallax keeps your progress and retries on its own.
+          Once it's running you can leave the page: progress shows in the sidebar, and if the AI provider has a hiccup Parallax keeps your
+          progress and retries on its own.
         </>
       ),
     },
@@ -115,7 +115,7 @@ function buildSteps({ orgName, role, latestReport, hasProjects }: Context): Step
       title: "Find anything",
       body: (
         <>
-          Search reports and jump between pages. Press <kbd className="mx-1 border border-border px-1 font-mono text-[11px]">⌘ K</kbd> from
+          Search reports and jump between pages. Press <kbd className="rounded-md mx-1 border border-border px-1 font-mono text-[11px]">⌘ K</kbd> from
           anywhere.
         </>
       ),
@@ -172,12 +172,11 @@ function buildSteps({ orgName, role, latestReport, hasProjects }: Context): Step
         id: "collab",
         path: "/org",
         target: '[data-tour="org-tabs"]',
-        title: "Collaboration",
+        title: "Team",
         body: (
           <>
-            {orgName} handles research the way software teams handle code. Projects are like repositories, drafts like branches, each
-            saved revision like a commit, and a review request like a pull request. Approved work is filed into the library. The Overview
-            shows what's waiting on you.
+            {orgName} handles research the way software teams handle code: projects hold drafts, drafts go to review, and approved work is
+            filed into the library. Board, Insights and the audit log are under More; Inbox, Members and Settings are the icons on the right.
           </>
         ),
       },
@@ -271,7 +270,7 @@ function buildSteps({ orgName, role, latestReport, hasProjects }: Context): Step
     id: "done",
     path: "/research",
     title: "You're ready",
-    body: <>That's the tour. Start with a question on this page. You can take the tour again any time from "Take the tour" in the sidebar.</>,
+    body: <>That's the tour. Start with a question on this page. You can take it again any time from your account menu at the bottom of the sidebar.</>,
   });
   return steps;
 }
@@ -350,6 +349,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
           step={steps[index]}
           index={index}
           total={steps.length}
+          nextPath={steps[index + 1]?.path ?? null}
           onBack={() => setIndex((i) => Math.max(0, (i ?? 0) - 1))}
           onNext={() => (index + 1 >= steps.length ? finish() : setIndex(index + 1))}
           // An optional step whose part isn't on screen is left out, so the count stays continuous,
@@ -386,10 +386,12 @@ function visibleRect(el: Element): Rect | null {
   return { top: r.top, left: r.left, width: r.width, height: r.height };
 }
 
-function TourStep({ step, index, total, onBack, onNext, onMissing, onClose }: {
+function TourStep({ step, index, total, nextPath, onBack, onNext, onMissing, onClose }: {
   step: Step;
   index: number;
   total: number;
+  /** The next step's page, loaded ahead so moving to it is instant. */
+  nextPath: string | null;
   onBack: () => void;
   onNext: () => void;
   onMissing: (forward: boolean) => void;
@@ -397,41 +399,46 @@ function TourStep({ step, index, total, onBack, onNext, onMissing, onClose }: {
 }) {
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  // What's currently on screen. It only changes once the next step's page and target are ready,
-  // so moving between steps is one clean swap instead of a flash through a blank state.
-  const [shown, setShown] = useState<{ step: Step; index: number; total: number; rect: Rect | null } | null>(null);
+  // Where the spotlight is, and which step it belongs to. The card's words change the moment
+  // Next is pressed; the spotlight and the card then glide to the new spot once it's on screen.
+  const [spotFor, setSpotFor] = useState<{ id: string; path: string; rect: Rect | null } | null>(null);
   const card = useRef<HTMLDivElement>(null);
+  const [cardHeight, setCardHeight] = useState(240);
   // The parent hands a new callback each render; the search below shouldn't restart for it.
   const missing = useRef(onMissing);
   missing.current = onMissing;
   const [viewport, setViewport] = useState({ w: 0, h: 0 });
 
-  // Go to the step's page.
+  // Go to the step's page. No cross-fade: the browser would fade the tour out and back in with the page.
   useEffect(() => {
-    if (pathname !== step.path) void router.navigate({ href: step.path });
+    if (pathname !== step.path) void router.navigate({ href: step.path, viewTransition: false });
   }, [step.path]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Find the target as soon as the page has drawn it, bring it into view, then show the step and follow the target.
+  // Load the next step's page in the background, so Next doesn't wait on it.
+  useEffect(() => {
+    if (nextPath && nextPath !== step.path) void router.preloadRoute({ to: nextPath } as Parameters<typeof router.preloadRoute>[0]).catch(() => undefined);
+  }, [nextPath, step.path, router]);
+
+  // Find the target as soon as the page has drawn it, bring it into view, and follow it as the page moves.
   useEffect(() => {
     if (pathname !== step.path) return;
     let found: Element | null = null;
-    let frame = 0;
     let raf = 0;
+    let frame = 0;
     let cancelled = false;
-    const reveal = (rect: Rect | null) => setShown({ step, index, total, rect });
+    const place = (rect: Rect | null) => setSpotFor({ id: step.id, path: step.path, rect });
     const measure = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        if (!found) return;
-        const rect = visibleRect(found);
-        setShown((s) => (s && s.step.id === step.id ? { ...s, rect } : s));
+        if (found && !cancelled) place(visibleRect(found));
       });
     };
     if (!step.target) {
-      reveal(null);
+      place(null);
       return;
     }
     const started = performance.now();
+    const observer = new ResizeObserver(measure);
     const look = () => {
       if (cancelled) return;
       const el = document.querySelector(step.target!);
@@ -439,14 +446,15 @@ function TourStep({ step, index, total, onBack, onNext, onMissing, onClose }: {
       if (el && r) {
         found = el;
         const inView = r.top >= 0 && r.top + r.height <= window.innerHeight;
-        if (!inView) el.scrollIntoView({ block: "center", behavior: "auto" });
-        raf = requestAnimationFrame(() => {
-          if (cancelled) return;
-          reveal(visibleRect(el));
-        });
+        // "instant": the page's own smooth scrolling would make the spotlight chase the target.
+        if (!inView) el.scrollIntoView({ block: "center", behavior: "instant" as ScrollBehavior });
+        place(visibleRect(el));
+        // Content that loads in after the target shifts it: follow along.
+        observer.observe(el);
+        observer.observe(document.body);
       } else if (performance.now() - started > 3000) {
         if (step.optional) missing.current(lastDirection);
-        else reveal(null);
+        else place(null);
       } else {
         raf = requestAnimationFrame(look);
       }
@@ -458,14 +466,11 @@ function TourStep({ step, index, total, onBack, onNext, onMissing, onClose }: {
       cancelled = true;
       cancelAnimationFrame(raf);
       cancelAnimationFrame(frame);
+      observer.disconnect();
       window.removeEventListener("resize", measure);
       window.removeEventListener("scroll", measure, true);
     };
-  }, [step.id, step.target, step.path, pathname, step.optional, index, total]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const view = shown;
-  const looking = !view;
-  const rect = view?.rect ?? null;
+  }, [step.id, step.target, step.path, pathname, step.optional]);
 
   useLayoutEffect(() => {
     const update = () => setViewport({ w: window.innerWidth, h: window.innerHeight });
@@ -474,7 +479,12 @@ function TourStep({ step, index, total, onBack, onNext, onMissing, onClose }: {
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  // Keyboard: arrows move, Escape ends. Focus moves to the card so screen readers announce the step.
+  // The card's height decides where it fits; measured after each change of words.
+  useLayoutEffect(() => {
+    if (card.current) setCardHeight(card.current.offsetHeight);
+  }, [step.id, viewport.w]);
+
+  // Keyboard: arrows move, Escape ends.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -489,43 +499,62 @@ function TourStep({ step, index, total, onBack, onNext, onMissing, onClose }: {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [index, onBack, onNext, onClose]);
+  // Focus follows the step, so screen readers announce each one.
   useEffect(() => {
-    if (!looking) card.current?.focus({ preventScroll: true });
-  }, [looking]);
+    card.current?.focus({ preventScroll: true });
+  }, [step.id]);
 
+  const current = spotFor?.id === step.id;
+  const rect = spotFor?.rect ?? null;
+  const spot = rect ? { top: rect.top - PAD, left: rect.left - PAD, width: rect.width + PAD * 2, height: rect.height + PAD * 2 } : null;
+  // Waiting for another page: the window closes to its centre, so it never frames the wrong thing.
+  const leaving = !current && spotFor !== null && spotFor.path !== step.path;
+  const hole = spot && leaving ? { top: spot.top + spot.height / 2, left: spot.left + spot.width / 2, width: 0, height: 0 } : spot;
+
+  // The card's place, always as top and left so a move between steps can glide.
+  // Beside the lit-up part where there's room, below or above it otherwise, centred without one;
+  // a sheet along the bottom on phones. Until the new spot is known, it stays where it was.
   const phone = viewport.w > 0 && viewport.w < 640;
-  const spot = rect && !looking ? { top: rect.top - PAD, left: rect.left - PAD, width: rect.width + PAD * 2, height: rect.height + PAD * 2 } : null;
-
-  // Beside the lit-up part where there's room, below or above it otherwise; a sheet at the bottom on phones.
-  let position: React.CSSProperties = { top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: `min(${CARD_WIDTH + 80}px, calc(100vw - 32px))` };
-  if (phone) {
-    position = { left: 12, right: 12, bottom: "calc(12px + env(safe-area-inset-bottom))" };
-  } else if (spot) {
+  const lastPlace = useRef<{ top: number; left: number; width: number } | null>(null);
+  let place: { top: number; left: number; width: number };
+  const centred = () => {
+    const width = Math.min(CARD_WIDTH + 80, viewport.w - 32);
+    return { top: Math.max(16, (viewport.h - cardHeight) / 2), left: (viewport.w - width) / 2, width };
+  };
+  if (!current && lastPlace.current) {
+    place = lastPlace.current;
+  } else if (!spot) {
+    place = centred();
+  } else {
     const width = CARD_WIDTH;
     const clampLeft = (x: number) => Math.min(Math.max(16, x), viewport.w - width - 16);
+    const clampTop = (y: number) => Math.min(Math.max(16, y), viewport.h - cardHeight - 16);
     if (spot.left + spot.width + 16 + width <= viewport.w - 16 && spot.width < viewport.w * 0.5) {
-      position = { top: Math.min(Math.max(16, spot.top), viewport.h - 260), left: spot.left + spot.width + 16, width };
-    } else if (viewport.h - (spot.top + spot.height) > 240) {
-      position = { top: spot.top + spot.height + 12, left: clampLeft(spot.left), width };
-    } else if (spot.top > 240) {
-      position = { bottom: viewport.h - spot.top + 12, left: clampLeft(spot.left), width };
+      place = { top: clampTop(spot.top), left: spot.left + spot.width + 16, width };
+    } else if (viewport.h - (spot.top + spot.height) > cardHeight + 28) {
+      place = { top: spot.top + spot.height + 12, left: clampLeft(spot.left), width };
+    } else if (spot.top > cardHeight + 28) {
+      place = { top: spot.top - cardHeight - 12, left: clampLeft(spot.left), width };
     } else {
-      position = { bottom: 16, right: 16, width };
+      place = { top: viewport.h - cardHeight - 16, left: viewport.w - width - 16, width };
     }
   }
+  if (current) lastPlace.current = place;
+  const position: React.CSSProperties = phone
+    ? { left: 12, right: 12, bottom: "calc(12px + env(safe-area-inset-bottom))" }
+    : { top: place.top, left: place.left, width: place.width };
 
-  const cur = view?.step ?? step;
-  const curIndex = view?.index ?? index;
-  const curTotal = view?.total ?? total;
-  const last = curIndex === curTotal - 1;
+  const last = index === total - 1;
+  const glide = "transition-[top,left,width,height] duration-[260ms] ease-out motion-reduce:transition-none";
 
   return createPortal(
-    <div className="fixed inset-0 z-[100]" aria-hidden={false}>
+    // Its own view-transition layer, so no page cross-fade ever carries the tour with it.
+    <div className="fixed inset-0 z-[100]" style={{ viewTransitionName: "tour" }}>
       {/* The dimmed page, with a window cut out around the part being explained. */}
-      {spot ? (
+      {hole ? (
         <div
-          className="pointer-events-none fixed border-2 border-white/90 transition-all duration-300 ease-out motion-reduce:transition-none"
-          style={{ ...spot, boxShadow: "0 0 0 9999px rgb(0 0 0 / 0.55)" }}
+          className={`rounded-xl pointer-events-none fixed border-2 border-white/90 ${glide}`}
+          style={{ ...hole, boxShadow: "0 0 0 9999px rgb(0 0 0 / 0.55)", borderColor: hole.width ? undefined : "transparent" }}
         />
       ) : (
         <div className="fixed inset-0 bg-black/55" />
@@ -540,25 +569,25 @@ function TourStep({ step, index, total, onBack, onNext, onMissing, onClose }: {
         aria-labelledby="tour-title"
         aria-describedby="tour-body"
         tabIndex={-1}
-        className="fixed border border-border bg-popover text-popover-foreground shadow-2xl outline-none animate-in fade-in-0 duration-150"
+        className={`rounded-xl fixed border border-border bg-popover text-popover-foreground shadow-2xl outline-none ${phone ? "" : glide}`}
         style={position}
       >
-        <div key={cur.id} className="animate-in fade-in-0 duration-150">
-        <div className="flex items-start justify-between gap-3 px-5 pt-4">
-          <div className="min-w-0">
-            <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-              {curIndex + 1} of {curTotal} · <span className="normal-case tracking-normal">{cur.path.startsWith("/reports/") ? "/reports/…" : cur.path}</span>
-            </p>
-            <h2 id="tour-title" className="mt-1 text-2xl leading-tight">{cur.title}</h2>
+        <div key={step.id} className="animate-in fade-in-0 duration-150">
+          <div className="flex items-start justify-between gap-3 px-5 pt-4">
+            <div className="min-w-0">
+              <p className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                {index + 1} of {total} · <span className="normal-case tracking-normal">{step.path.startsWith("/reports/") ? "/reports/…" : step.path}</span>
+              </p>
+              <h2 id="tour-title" className="mt-1 text-2xl leading-tight">{step.title}</h2>
+            </div>
+            <Button variant="ghost" size="icon" className="-mr-2 size-9 shrink-0" aria-label="End the tour" onClick={onClose}><X /></Button>
           </div>
-          <Button variant="ghost" size="icon" className="-mr-2 size-9 shrink-0" aria-label="End the tour" onClick={onClose}><X /></Button>
-        </div>
-        <div id="tour-body" className="px-5 pt-2 text-sm leading-relaxed text-muted-foreground">
-          {cur.body}
-        </div>
+          <div id="tour-body" className="px-5 pt-2 text-sm leading-relaxed text-muted-foreground">
+            {step.body}
+          </div>
         </div>
         <div className="mt-4 h-0.5 bg-muted">
-          <div className="h-full bg-primary transition-all duration-300" style={{ width: `${((curIndex + 1) / curTotal) * 100}%` }} />
+          <div className="h-full bg-primary transition-all duration-300" style={{ width: `${((index + 1) / total) * 100}%` }} />
         </div>
         <div className="flex items-center justify-between gap-2 px-5 py-3">
           <Button variant="ghost" size="sm" onClick={onClose} className="text-muted-foreground">

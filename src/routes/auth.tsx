@@ -91,12 +91,17 @@ function AuthPage() {
 
   return (
       <main className="mx-auto flex min-h-[calc(100dvh-4.5rem)] max-w-sm flex-col justify-center px-6 pb-12 pt-6 sm:py-16">
-        <ParallaxMark className="mx-auto mb-6 h-12 w-auto md:hidden" />
-        <h1 className="text-center text-4xl md:text-left">{mode === "in" ? "Welcome back" : "Create an account"}</h1>
+        <span className="mx-auto mb-6 flex size-12 items-center justify-center rounded-2xl border border-border bg-card shadow-[var(--shadow-soft)]">
+          <ParallaxMark className="h-6 w-auto" />
+        </span>
+        <h1 className="text-center text-2xl">{mode === "in" ? "Welcome back" : "Create your account"}</h1>
+        <p className="mt-1.5 text-center text-sm text-muted-foreground">
+          {mode === "in" ? "Sign in to continue your research." : "Evidence-linked research, in minutes."}
+        </p>
         <Button
           variant="outline"
           size="lg"
-          className="mt-8 w-full max-md:border-border max-md:bg-card max-md:shadow-md"
+          className="mt-8 w-full"
           disabled={googleBusy || busy}
           onClick={async () => {
             setGoogleBusy(true);
@@ -117,7 +122,11 @@ function AuthPage() {
           {googleBusy ? <Loader2 className="animate-spin" /> : <GoogleG />}
           Continue with Google
         </Button>
-        <div className="my-6 text-center font-mono text-xs uppercase text-muted-foreground">or</div>
+        <div className="my-6 flex items-center gap-3 text-xs text-muted-foreground">
+          <span className="h-px flex-1 bg-border" />
+          or
+          <span className="h-px flex-1 bg-border" />
+        </div>
         <form onSubmit={submit} className="space-y-4">
           {mode === "up" && (
             <fieldset className="space-y-2">
@@ -125,7 +134,7 @@ function AuthPage() {
               <div className="grid grid-cols-2 gap-2">
                 {([["personal", "Personal account", "Just for me"], ["organization", "Organization", "For my team"]] as const).map(([id, title, hint]) => (
                   <button key={id} type="button" role="radio" aria-checked={kind === id} onClick={() => setKind(id)}
-                    className={`press rounded-2xl border px-3 py-3 text-left transition-colors md:rounded-none md:py-2.5 ${kind === id ? "border-foreground bg-muted" : "border-border hover:bg-muted/50"}`}>
+                    className={`press rounded-xl border px-3 py-3 text-left transition-colors md:py-2.5 ${kind === id ? "border-foreground/60 bg-muted/60 ring-[3px] ring-foreground/[0.06]" : "border-border hover:bg-muted/50"}`}>
                     <div className="text-sm font-medium">{title}</div>
                     <div className="text-xs text-muted-foreground">{hint}</div>
                   </button>
@@ -155,10 +164,10 @@ function AuthPage() {
             {mode === "in" ? (busy ? "Signing in…" : "Sign in") : busy ? "Creating account…" : "Sign up"}
           </Button>
         </form>
-        <button className="mt-2 py-4 text-sm text-muted-foreground md:underline" onClick={() => setMode(mode === "in" ? "up" : "in")}>
-          {mode === "in" ? "No account? Sign up" : "Have an account? Sign in"}
+        <button className="mt-2 py-4 text-sm text-muted-foreground transition-colors hover:text-foreground" onClick={() => setMode(mode === "in" ? "up" : "in")}>
+          {mode === "in" ? <>No account? <span className="font-medium text-foreground">Sign up</span></> : <>Have an account? <span className="font-medium text-foreground">Sign in</span></>}
         </button>
-        <p className="mt-4 text-center text-xs text-muted-foreground md:text-left">
+        <p className="mt-4 text-center text-xs leading-relaxed text-muted-foreground">
           By continuing you agree to our <Link to="/terms" className="underline hover:text-foreground">Terms of Service</Link> and{" "}
           <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
         </p>

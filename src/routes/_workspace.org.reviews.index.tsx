@@ -53,7 +53,7 @@ function Reviews() {
           {projects.data?.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
         </select>
       </div>
-      <div className="border border-border bg-card">
+      <div className="rounded-xl border border-border bg-card">
         <div className="flex gap-1 overflow-x-auto border-b border-border px-2">
           {filters.map((x) => (
             <button key={x.id} type="button" onClick={() => setFilter(x.id)}

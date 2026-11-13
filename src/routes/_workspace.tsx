@@ -20,7 +20,7 @@ function MobileDrawerButton() {
       type="button"
       onClick={() => setOpenMobile(true)}
       aria-label={`${name} — open menu`}
-      className="press flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary font-mono text-sm uppercase text-primary-foreground md:hidden"
+      className="press flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-sm font-semibold uppercase text-foreground md:hidden"
     >
       {name.slice(0, 1)}
     </button>
@@ -36,8 +36,8 @@ export const Route = createFileRoute("/_workspace")({
 function sectionName(pathname: string) {
   if (pathname.startsWith("/reports/")) return "Report";
   if (pathname === "/history") return "History";
-  if (pathname === "/organization") return "Organization";
-  if (pathname === "/org" || pathname.startsWith("/org/")) return "Collaboration";
+  if (pathname === "/organization") return "Members";
+  if (pathname === "/org" || pathname.startsWith("/org/")) return "Team";
   return "New research";
 }
 
@@ -59,28 +59,28 @@ function Workspace() {
     <TourProvider>
       <SidebarProvider>
         <OrgBranding />
-        <WorkspaceSidebar onSearch={() => setSearchOpen(true)} />
+        <WorkspaceSidebar />
         <SidebarInset className="min-w-0 pb-[var(--tabbar-h,0px)] md:pb-0">
-          <header className="workspace-bar sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/70 bg-background/85 px-3 backdrop-blur-xl sm:px-4 lg:h-15 lg:px-8">
+          <header className="workspace-bar sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border/60 bg-background/80 px-3 backdrop-blur-xl sm:px-4 lg:px-6">
             <MobileDrawerButton />
-            <SidebarTrigger className="hidden md:inline-flex text-muted-foreground transition-colors hover:text-foreground" />
-            <span className="hidden h-4 w-px bg-border/60 md:block" />
-            <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-2 text-sm">
-              <span className="hidden max-w-44 truncate font-mono text-xs tracking-tight text-muted-foreground md:inline">{workspace.name}</span>
-              <span className="hidden text-xs text-border/80 md:inline">/</span>
-              <span className="truncate text-lg font-semibold tracking-tight md:text-sm md:font-medium text-foreground">{sectionName(pathname)}</span>
+            <SidebarTrigger className="-ml-1 hidden text-muted-foreground transition-colors hover:text-foreground md:inline-flex" />
+            <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1.5 text-sm">
+              <span className="hidden max-w-44 truncate text-muted-foreground md:inline">{workspace.name}</span>
+              <span aria-hidden className="hidden text-muted-foreground/40 md:inline">/</span>
+              <span className="truncate text-lg font-semibold tracking-tight text-foreground md:text-sm md:font-medium">{sectionName(pathname)}</span>
             </nav>
             <button
               type="button"
+              data-tour="search"
               onClick={() => setSearchOpen(true)}
               aria-label="Search reports"
-              className="ml-auto hidden h-8 items-center justify-between gap-3 border border-border/80 bg-card/60 px-3 text-xs text-muted-foreground transition-all duration-200 hover:border-foreground/40 hover:bg-card hover:text-foreground hover:shadow-xs md:flex lg:w-64 xl:w-72"
+              className="ml-auto hidden h-8 w-60 items-center justify-between gap-3 rounded-lg border border-border bg-muted/50 px-2.5 text-[13px] text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground md:flex xl:w-72"
             >
-              <div className="flex items-center gap-2 min-w-0">
-                <Search className="size-3.5 shrink-0 opacity-70" />
-                <span className="truncate">Search reports…</span>
-              </div>
-              <kbd className="font-mono text-[10px] rounded border border-border/60 bg-muted/60 px-1 py-0.5 text-muted-foreground">⌘K</kbd>
+              <span className="flex min-w-0 items-center gap-2">
+                <Search className="size-3.5 shrink-0" />
+                <span className="truncate">Search</span>
+              </span>
+              <kbd className="rounded-md border border-border bg-background px-1.5 font-mono text-[10px] leading-5 text-muted-foreground">⌘K</kbd>
             </button>
           </header>
           <div key={pathname} className="page-enter">

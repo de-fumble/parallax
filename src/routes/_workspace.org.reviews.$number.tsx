@@ -46,7 +46,7 @@ function ReviewPage() {
   const person = usePeople();
 
   if (query.isPending) return <Skeleton className="h-64" />;
-  if (query.isError) return <p className="border border-weak/40 bg-weak/5 p-4 text-sm">{query.error.message}</p>;
+  if (query.isError) return <p className="rounded-xl border border-weak/40 bg-weak/5 p-4 text-sm">{query.error.message}</p>;
   const data = query.data;
   if (!data) return <p>Review request #{number} doesn't exist or you don't have access to it. <Link to="/org/reviews" className="underline">All requests</Link></p>;
   const { review: r, draft, before, after, comments, attachments } = data;
@@ -57,7 +57,7 @@ function ReviewPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl leading-tight [overflow-wrap:anywhere] sm:text-3xl">
+        <h1 className="text-2xl leading-tight [overflow-wrap:anywhere] sm:text-[1.75rem]">
           {r.title} <span className="font-normal text-muted-foreground">#{r.number}</span>
         </h1>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
@@ -80,7 +80,7 @@ function ReviewPage() {
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="min-w-0 space-y-5">
-          <article className="border border-border bg-card">
+          <article className="rounded-xl border border-border bg-card">
             <header className="flex items-center gap-2 border-b border-border bg-muted/40 px-4 py-2 text-sm">
               <Avatar id={r.author_id} size="sm" /> <span className="font-medium">{person(r.author_id).name}</span>
               <span className="text-muted-foreground">submitted {timeAgo(r.created_at)} · {r.kind}</span>
@@ -111,7 +111,7 @@ function ReviewPage() {
                           toast.error("Couldn't open the file", { description: err instanceof Error ? err.message : undefined });
                         }
                       }}
-                      className="flex items-center gap-1.5 border border-border px-2 py-1 text-xs hover:bg-muted"
+                      className="rounded-md flex items-center gap-1.5 border border-border px-2 py-1 text-xs hover:bg-muted"
                     >
                       <Paperclip className="size-3" /> {a.name} <span className="text-muted-foreground">{Math.max(1, Math.round(a.size / 1024))} KB</span>
                     </button>
@@ -241,7 +241,7 @@ function SectionComments({ data, section, body }: { data: ReviewData; section: s
                 <AtSign className="size-4" />
               </button>
               {picking && (
-                <ul className="absolute bottom-10 right-2 z-10 max-h-48 w-56 overflow-y-auto border border-border bg-popover shadow-lg">
+                <ul className="rounded-xl absolute bottom-10 right-2 z-10 max-h-48 w-56 overflow-y-auto border border-border bg-popover shadow-lg">
                   {members.map((m) => (
                     <li key={m.user_id}>
                       <button type="button" className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-muted"
@@ -301,7 +301,7 @@ function CommentItem({ c, data }: { c: Comment; data: ReviewData }) {
         {c.body.split(mention).map((part, i) => (part.startsWith("@") && names.includes(part.slice(1)) ? <span key={i} className="font-medium underline decoration-dotted">{part}</span> : part))}
       </p>
       {c.suggestion && (
-        <div className="mt-2 border border-border">
+        <div className="rounded-xl mt-2 border border-border">
           <div className="border-b border-border bg-muted/40 px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Suggested wording</div>
           <p className="whitespace-pre-wrap bg-strong/10 px-2 py-1.5 text-sm">{c.suggestion}</p>
           {isAuthor && open && !c.resolved && (
@@ -327,7 +327,7 @@ function CommentItem({ c, data }: { c: Comment; data: ReviewData }) {
             <Smile className="size-3.5" />
           </button>
           {react && (
-            <div className="absolute left-0 top-8 z-10 flex gap-1 border border-border bg-popover p-1 shadow-lg">
+            <div className="rounded-xl absolute left-0 top-8 z-10 flex gap-1 border border-border bg-popover p-1 shadow-lg">
               {REACTIONS.map((e) => {
                 const mine = reactions.some((x) => x.emoji === e && x.user_id === me);
                 return (
@@ -476,7 +476,7 @@ function DecisionBox({ data }: { data: ReviewData }) {
   }
 
   return (
-    <section className="border-2 border-foreground bg-card">
+    <section className="rounded-xl border-2 border-foreground bg-card">
       <div className="flex items-start gap-3 border-b border-border p-4">
         {r.status === "filed" ? <CheckCircle2 className="mt-0.5 size-5 text-strong" /> : r.status === "closed" || r.status === "changes_requested" ? <XCircle className="mt-0.5 size-5 text-weak" /> : <Clock className="mt-0.5 size-5 text-muted-foreground" />}
         <div className="min-w-0">

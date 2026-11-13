@@ -85,7 +85,7 @@ function Chip({ children }: { children: React.ReactNode }) {
 function SampleReport() {
   return (
     <figure className="reveal">
-      <div className="border border-border bg-card shadow-[0_30px_80px_-40px_rgb(0_0_0/0.35)]">
+      <div className="rounded-xl border border-border bg-card shadow-[0_30px_80px_-40px_rgb(0_0_0/0.35)]">
         <div className="flex items-center justify-between border-b border-border px-5 py-3">
           <div className="flex gap-1.5">
             <span className="size-2.5 rounded-full bg-border" />
@@ -97,12 +97,12 @@ function SampleReport() {
         <div className="grid gap-8 p-5 md:grid-cols-[1.25fr_1fr] md:gap-10 md:p-10">
           <div>
             <div className="flex flex-wrap gap-2 font-mono text-[10px] uppercase tracking-wider">
-              <span className="bg-muted px-1.5 py-0.5 text-muted-foreground">Medium</span>
-              <span className="bg-moderate/20 px-1.5 py-0.5">Partial</span>
-              <span className="bg-moderate/20 px-1.5 py-0.5">Medium confidence</span>
+              <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">Medium</span>
+              <span className="rounded-full bg-moderate/20 px-2 py-0.5">Partial</span>
+              <span className="rounded-full bg-moderate/20 px-2 py-0.5">Medium confidence</span>
             </div>
-            <h3 className="mt-4 text-3xl leading-tight md:text-4xl">Is sodium-ion storage ready for the grid?</h3>
-            <div className="mt-6 border-l-2 border-foreground pl-5">
+            <h3 className="mt-4 text-2xl leading-tight md:text-3xl">Is sodium-ion storage ready for the grid?</h3>
+            <div className="mt-6 rounded-xl bg-muted/60 p-4">
               <div className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">Bottom line</div>
               <p className="mt-2 leading-relaxed">
                 Sodium-ion storage is operating at utility scale in pilot plants<Chip>S1</Chip>, but cell costs have not
@@ -123,7 +123,7 @@ function SampleReport() {
                       A grid-connected plant has reported round-trip efficiency above 90%<Chip>S1</Chip>.
                     </p>
                     <div className="mt-1.5 flex gap-1.5 font-mono text-[10px] uppercase tracking-wider">
-                      <span className="bg-strong/15 px-1.5 py-0.5 text-strong">Strong</span>
+                      <span className="rounded-full bg-strong/15 px-2 py-0.5 text-strong">Strong</span>
                     </div>
                   </div>
                 </li>
@@ -135,8 +135,8 @@ function SampleReport() {
                       <Chip>S5</Chip>.
                     </p>
                     <div className="mt-1.5 flex gap-1.5 font-mono text-[10px] uppercase tracking-wider">
-                      <span className="bg-weak/15 px-1.5 py-0.5 text-weak">Weak</span>
-                      <span className="bg-muted px-1.5 py-0.5 text-muted-foreground">Contested</span>
+                      <span className="rounded-full bg-weak/15 px-2 py-0.5 text-weak">Weak</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">Contested</span>
                     </div>
                   </div>
                 </li>
@@ -169,12 +169,12 @@ function Landing() {
               <Eyebrow>AI research engine</Eyebrow>
             </div>
             <h1
-              className="rise-in mt-5 text-[3.25rem] leading-[0.98] tracking-tight sm:text-6xl md:text-7xl lg:text-[5.5rem]"
+              className="rise-in mt-5 text-[3rem] leading-[1] tracking-[-0.04em] sm:text-6xl md:text-7xl lg:text-[5rem]"
               style={{ "--i": 1 } as React.CSSProperties}
             >
               Research that
               <br />
-              <em className="text-muted-foreground">shows its work.</em>
+              <span className="text-muted-foreground">shows its work.</span>
             </h1>
             <p
               className="rise-in mt-7 max-w-xl text-lg leading-relaxed text-muted-foreground"
@@ -205,13 +205,13 @@ function Landing() {
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
         <div className="reveal max-w-2xl">
           <Eyebrow>The standard</Eyebrow>
-          <h2 className="mt-4 text-4xl leading-tight md:text-5xl">An answer is only as good as what stands behind it.</h2>
+          <h2 className="mt-4 text-3xl leading-tight tracking-[-0.03em] md:text-[2.75rem]">An answer is only as good as what stands behind it.</h2>
         </div>
-        <div className="mt-10 grid gap-3 md:mt-14 md:grid-cols-3 md:gap-0 md:border-l md:border-t md:border-border">
+        <div className="mt-10 grid gap-4 md:mt-14 md:grid-cols-3">
           {PRINCIPLES.map((p, i) => (
-            <div key={p.title} className="reveal border-border p-6 transition-colors duration-300 hover:bg-muted/60 max-md:rounded-3xl max-md:border max-md:bg-card sm:p-8 md:border-b md:border-r">
+            <div key={p.title} className="reveal rounded-2xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] transition-colors duration-300 hover:bg-muted/40 sm:p-8">
               <div className="font-mono text-xs text-muted-foreground">{String(i + 1).padStart(2, "0")}</div>
-              <h3 className="mt-6 text-3xl">{p.title}</h3>
+              <h3 className="mt-6 text-xl">{p.title}</h3>
               <p className="mt-3 leading-relaxed text-muted-foreground">{p.body}</p>
             </div>
           ))}
@@ -223,7 +223,7 @@ function Landing() {
         <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
           <div className="reveal mx-auto max-w-2xl text-center">
             <Eyebrow>The report</Eyebrow>
-            <h2 className="mt-4 text-4xl leading-tight md:text-5xl">Built to be checked.</h2>
+            <h2 className="mt-4 text-3xl leading-tight tracking-[-0.03em] md:text-[2.75rem]">Built to be checked.</h2>
             <p className="mt-4 text-lg leading-relaxed text-muted-foreground">
               Findings are rated by the strength of their evidence. Inferences are labelled as interpretation. What the
               sources couldn't answer is listed, not hidden.
@@ -240,22 +240,22 @@ function Landing() {
         <div className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
           <div className="reveal max-w-2xl">
             <Eyebrow inverse>How it works</Eyebrow>
-            <h2 className="mt-4 text-4xl leading-tight md:text-5xl">From question to cited report in three steps.</h2>
+            <h2 className="mt-4 text-3xl leading-tight tracking-[-0.03em] md:text-[2.75rem]">From question to cited report in three steps.</h2>
           </div>
           <ol className="mt-10 grid gap-3 md:mt-14 md:grid-cols-3 md:gap-8">
             {STEPS.map((s, i) => (
-              <li key={s.title} className="reveal border-background/25 max-md:rounded-3xl max-md:bg-background/10 max-md:p-6 md:border-t md:pt-6">
+              <li key={s.title} className="reveal rounded-2xl bg-background/[0.06] p-6 ring-1 ring-background/10">
                 <div className="font-mono text-xs text-background/60">{String(i + 1).padStart(2, "0")}</div>
-                <h3 className="mt-4 text-3xl">{s.title}</h3>
+                <h3 className="mt-4 text-xl">{s.title}</h3>
                 <p className="mt-3 leading-relaxed text-background/70">{s.body}</p>
               </li>
             ))}
           </ol>
-          <div className="reveal mt-10 grid gap-3 md:mt-16 md:gap-px md:border md:border-background/25 md:bg-background/25 md:grid-cols-3">
+          <div className="reveal mt-10 grid gap-4 md:mt-12 md:grid-cols-3">
             {DEPTHS.map((d) => (
-              <div key={d.name} className="bg-foreground p-6 max-md:rounded-3xl max-md:border max-md:border-background/25">
+              <div key={d.name} className="rounded-2xl p-6 ring-1 ring-background/15">
                 <div className="font-mono text-xs uppercase tracking-widest text-background/60">Depth</div>
-                <div className="mt-2 font-serif text-2xl">{d.name}</div>
+                <div className="mt-2 text-xl font-semibold tracking-tight">{d.name}</div>
                 <p className="mt-1 text-sm text-background/70">{d.body}</p>
               </div>
             ))}
@@ -267,12 +267,12 @@ function Landing() {
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-6 sm:py-24">
         <div className="reveal max-w-2xl">
           <Eyebrow>Inside every report</Eyebrow>
-          <h2 className="mt-4 text-4xl leading-tight md:text-5xl">More than a summary.</h2>
+          <h2 className="mt-4 text-3xl leading-tight tracking-[-0.03em] md:text-[2.75rem]">More than a summary.</h2>
         </div>
         <div className="mt-10 grid gap-3 sm:grid-cols-2 md:mt-14 md:gap-x-10 md:gap-y-12 lg:grid-cols-3">
           {ANATOMY.map((a) => (
-            <div key={a.title} className="reveal max-md:rounded-3xl max-md:border max-md:border-border max-md:bg-card max-md:p-6 md:border-t md:border-foreground md:pt-5">
-              <h3 className="text-2xl">{a.title}</h3>
+            <div key={a.title} className="reveal max-md:rounded-2xl max-md:border max-md:border-border max-md:bg-card max-md:p-6 md:border-t md:border-border md:pt-5">
+              <h3 className="text-lg">{a.title}</h3>
               <p className="mt-2 leading-relaxed text-muted-foreground">{a.body}</p>
             </div>
           ))}
@@ -283,10 +283,10 @@ function Landing() {
       <section className="border-t border-border">
         <div className="reveal mx-auto flex max-w-3xl flex-col items-center px-5 py-20 sm:px-6 sm:py-28 text-center">
           <ParallaxMark className="h-14 w-auto" />
-          <h2 className="mt-8 text-5xl leading-[1.02] md:text-6xl">
+          <h2 className="mt-8 text-4xl leading-[1.05] tracking-[-0.035em] md:text-6xl">
             Ask a harder question.
             <br />
-            <em className="text-muted-foreground">See the evidence.</em>
+            <span className="text-muted-foreground">See the evidence.</span>
           </h2>
           <Button asChild size="lg" className="group mt-10 md:h-12 md:px-7">
             <Link to="/research">

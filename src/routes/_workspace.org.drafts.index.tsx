@@ -54,7 +54,7 @@ function Drafts() {
           <input type="checkbox" className="size-4" checked={mineOnly} onChange={(e) => setMineOnly(e.target.checked)} /> Only mine
         </label>
       </div>
-      <div className="border border-border bg-card">
+      <div className="rounded-xl border border-border bg-card">
         <div className="flex gap-1 overflow-x-auto border-b border-border px-2">
           {SHELVES.map((s) => (
             <button key={s.id} type="button" onClick={() => void navigate({ search: { shelf: s.id }, replace: true })}
@@ -102,7 +102,7 @@ function DraftRow({ d, projectName }: { d: Draft; projectName: string | undefine
           <BookOpen className="size-3.5" /> In the library
         </Link>
       ) : d.status === "closed" ? (
-        <span className="border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Closed</span>
+        <span className="rounded-md border border-border px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">Closed</span>
       ) : review ? (
         <Link to="/org/reviews/$number" params={{ number: String(review.number) }} className="text-xs">#{review.number} <StatusPill status={review.status} /></Link>
       ) : (

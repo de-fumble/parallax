@@ -75,11 +75,11 @@ function History() {
   }, [rows, text, depth]);
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-4 sm:px-6 sm:py-10">
+    <div className="mx-auto w-full max-w-4xl px-4 py-4 sm:px-6 sm:py-12">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="hidden text-3xl leading-tight sm:text-4xl md:block">History</h1>
-          <p className="text-sm text-muted-foreground md:mt-2 md:text-base">
+          <h1 className="hidden text-[1.75rem] leading-tight md:block">History</h1>
+          <p className="text-sm text-muted-foreground md:mt-1">
             {rows ? `${rows.length} ${rows.length === 1 ? "report" : "reports"} in ${org ? org.name : "your personal workspace"}` : "Saved reports"}
           </p>
         </div>
@@ -89,16 +89,16 @@ function History() {
       </div>
 
       {rows && rows.length > 0 && (
-        <div className="mt-4 space-y-3 md:mt-8 md:flex md:flex-wrap md:items-center md:gap-3 md:space-y-0">
+        <div className="mt-4 space-y-3 md:mt-8 md:flex md:flex-wrap md:items-center md:gap-2 md:space-y-0">
           <div className="relative min-w-56 flex-1">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-muted-foreground md:left-3" />
             <Input value={text} onChange={(e) => setText(e.target.value)} placeholder="Search" className="pl-10 max-md:rounded-2xl md:pl-9" aria-label="Filter reports" />
           </div>
-          <div role="radiogroup" aria-label="Depth" className="flex rounded-full bg-muted/70 p-1 md:rounded-none md:border md:border-border md:bg-transparent md:p-0">
+          <div role="radiogroup" aria-label="Depth" className="flex rounded-full bg-muted p-1 md:rounded-lg md:p-0.5">
             {DEPTHS.map((d) => (
               <button key={d} type="button" role="radio" aria-checked={depth === d} onClick={() => setDepth(d)}
-                className={`flex-1 rounded-full px-3 py-2 font-mono text-[11px] uppercase tracking-wider transition-all duration-200 md:flex-none md:rounded-none md:py-2 md:text-[10px] ${depth === d ? "bg-background text-foreground shadow-sm md:bg-foreground md:text-background md:shadow-none" : "text-muted-foreground hover:text-foreground"}`}>
-                {d === "ALL" ? "All" : d}
+                className={`flex-1 rounded-full px-3 py-2 text-[13px] font-medium transition-all duration-150 md:h-8 md:flex-none md:rounded-md md:py-0 ${depth === d ? "bg-background text-foreground shadow-[var(--shadow-soft)]" : "text-muted-foreground hover:text-foreground"}`}>
+                {d === "ALL" ? "All" : d.charAt(0) + d.slice(1).toLowerCase()}
               </button>
             ))}
           </div>
@@ -120,15 +120,15 @@ function History() {
       )}
 
       {list.isError && (
-        <div role="alert" className="mt-6 border border-weak/40 bg-weak/5 p-4 text-sm">
+        <div role="alert" className="mt-6 rounded-xl border border-weak/30 bg-weak/5 p-4 text-sm">
           <p>Couldn't load your reports: {list.error.message}</p>
           <Button variant="outline" size="sm" className="mt-3" onClick={() => list.refetch()}>Try again</Button>
         </div>
       )}
 
       {rows?.length === 0 && (
-        <div className="mt-8 border border-dashed border-border p-10 text-center animate-in fade-in duration-300">
-          <p className="font-serif text-2xl">No reports yet</p>
+        <div className="mt-10 rounded-2xl border border-dashed border-border px-6 py-16 text-center animate-in fade-in duration-300">
+          <p className="text-lg font-semibold tracking-tight">No reports yet</p>
           <p className="mt-2 text-sm text-muted-foreground">
             {org ? `Research run in ${org.name} is saved here for every member.` : "Every report you run is saved here."}
           </p>
@@ -144,26 +144,26 @@ function History() {
       )}
 
       {visible && visible.length > 0 && (
-        <ul className="mt-5 divide-y divide-border/60 overflow-hidden rounded-2xl bg-card shadow-sm animate-in fade-in duration-300 md:mt-6 md:divide-border md:rounded-none md:border-y md:border-border md:bg-transparent md:shadow-none">
+        <ul className="mt-5 divide-y divide-border/70 overflow-hidden rounded-2xl border border-border/70 bg-card shadow-[var(--shadow-soft)] animate-in fade-in duration-300 md:mt-6 md:rounded-xl">
           {visible.map((r) => (
-            <li key={r.id} className="group flex items-center gap-1 pr-2 md:gap-4 md:py-4 md:pr-0">
+            <li key={r.id} className="group flex items-center gap-1 pr-2 transition-colors hover:bg-muted/40 md:pr-3">
               <Link
                 to="/reports/$id"
                 params={{ id: r.id }}
-                className="press flex min-w-0 flex-1 items-center gap-3 px-4 py-3.5 active:bg-muted/60 md:block md:px-0 md:py-0 md:active:bg-transparent"
+                className="press flex min-w-0 flex-1 items-center gap-3.5 px-4 py-3.5 active:bg-muted/60 md:active:bg-transparent"
                 onMouseEnter={() => queryClient.prefetchQuery(reportQuery(r.id))}
                 onFocus={() => queryClient.prefetchQuery(reportQuery(r.id))}
               >
-                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground md:hidden">
-                  <FileText className="size-5" strokeWidth={1.75} />
+                <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground md:size-9 md:rounded-lg">
+                  <FileText className="size-5 md:size-4" strokeWidth={1.75} />
                 </span>
                 <span className="block min-w-0 flex-1">
                   {/* Two lines of title on a phone, where one line shows too little of it. */}
-                  <span className="line-clamp-2 block text-[17px] font-medium leading-snug tracking-tight md:font-serif md:text-xl md:font-normal md:decoration-1 md:underline-offset-4 md:group-hover:underline md:line-clamp-1">{r.title || r.topic}</span>
-                  <span className="mt-0.5 block truncate text-[13px] text-muted-foreground md:mt-1 md:font-mono md:text-xs">
+                  <span className="line-clamp-2 block text-[17px] font-medium leading-snug tracking-tight md:line-clamp-1 md:text-[15px]">{r.title || r.topic}</span>
+                  <span className="mt-0.5 block truncate text-[13px] text-muted-foreground">
                     <span className="md:hidden">{new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
-                    <span className="hidden md:inline">{new Date(r.created_at).toLocaleString()}</span>
-                    {" · "}<span className="capitalize md:normal-case">{r.mode.toLowerCase()}</span>
+                    <span className="hidden md:inline">{new Date(r.created_at).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</span>
+                    {" · "}<span className="capitalize">{r.mode.toLowerCase()}</span>
                     {org && ` · ${authorOf(r.user_id)}`}
                     <span className="hidden md:inline">
                       {r.status && ` · ${r.status.replace("_", " ")}`}
@@ -178,9 +178,8 @@ function History() {
                   <Button variant="ghost" size="sm" onClick={() => setConfirming(null)}>Cancel</Button>
                 </div>
               ) : (
-                <Button variant="ghost" size="sm" className="shrink-0 text-muted-foreground max-md:size-10 max-md:px-0" aria-label={`Delete ${r.title || r.topic}`} onClick={() => setConfirming(r.id)}>
-                  <Trash2 className="md:hidden" />
-                  <span className="hidden md:inline">Delete</span>
+                <Button variant="ghost" size="sm" className="shrink-0 text-muted-foreground opacity-100 max-md:size-10 max-md:px-0 md:size-8 md:px-0 md:opacity-0 md:group-hover:opacity-100 md:focus-visible:opacity-100" aria-label={`Delete ${r.title || r.topic}`} onClick={() => setConfirming(r.id)}>
+                  <Trash2 />
                 </Button>
               )}
             </li>

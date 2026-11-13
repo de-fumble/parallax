@@ -49,7 +49,7 @@ function Inbox() {
           <input type="checkbox" checked={unreadOnly} onChange={(e) => setUnreadOnly(e.target.checked)} className="size-4" /> Unread only
         </label>
       </div>
-      <ul className="divide-y divide-border border border-border bg-card">
+      <ul className="rounded-xl divide-y divide-border border border-border bg-card">
         {shown.map((n) => (
           <li key={n.id}>
             <button

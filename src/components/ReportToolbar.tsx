@@ -89,17 +89,17 @@ export function ReportToolbar({ id, source, context, edited, canChange, onEdit, 
   const runAgain = { topic: source.topic, ...(context ? { context } : {}), mode: source.report.mode };
 
   return (
-    <div data-tour="report-toolbar" className="flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4 mb-6 lg:mb-8 lg:pb-5 print:hidden">
+    <div data-tour="report-toolbar" className="mb-8 flex flex-wrap items-center justify-between gap-3 print:hidden">
       <div className="flex flex-wrap items-center gap-2.5">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button size="sm" disabled={exporting !== null} className="gap-2 shadow-2xs">
+            <Button size="sm" disabled={exporting !== null} className="gap-2">
               {exporting ? <Loader2 className="animate-spin size-3.5" /> : <Download className="size-3.5" />}
               <span>{exporting ? "Preparing…" : "Export report"}</span>
               <ChevronDown className="size-3 opacity-70" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-60 shadow-lg">
+          <DropdownMenuContent align="start" className="w-60">
             <DropdownMenuLabel className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
               Document format
             </DropdownMenuLabel>
@@ -114,7 +114,7 @@ export function ReportToolbar({ id, source, context, edited, canChange, onEdit, 
         </DropdownMenu>
 
         {canChange && (
-          <Button variant="outline" size="sm" onClick={onEdit} className="gap-1.5 border-border/80 hover:bg-muted/50">
+          <Button variant="outline" size="sm" onClick={onEdit} className="gap-1.5">
             <Pencil className="size-3.5" /> <span>Edit report</span>
           </Button>
         )}

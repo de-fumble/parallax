@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_workspace/organization")({
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="border border-border bg-card">
+    <section className="rounded-xl border border-border bg-card">
       <header className="border-b border-border px-5 py-3 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{title}</header>
       {children}
     </section>
@@ -86,9 +86,9 @@ function OrganizationPage() {
   if (!org) {
     return (
       <div className="mx-auto w-full max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
-        <h1 className="text-3xl leading-tight sm:text-4xl">Organization</h1>
-        <div className="mt-8 border border-dashed border-border p-8 text-center">
-          <p className="font-serif text-2xl">You're in your personal workspace</p>
+        <h1 className="text-2xl leading-tight sm:text-[1.75rem]">Organization</h1>
+        <div className="rounded-xl mt-8 border border-dashed border-border p-8 text-center">
+          <p className="text-lg font-semibold tracking-tight">You're in your personal workspace</p>
           <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
             An organization is a shared workspace for a team. Create one, or join one with an invite, from the workspace menu at the top of the sidebar.
           </p>
@@ -109,7 +109,7 @@ function OrganizationPage() {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 px-4 py-6 sm:px-6 sm:py-10">
       <div>
-        <h1 data-tour="members" className="text-3xl leading-tight [overflow-wrap:anywhere] sm:text-4xl">{org.name}</h1>
+        <h1 data-tour="members" className="text-2xl leading-tight [overflow-wrap:anywhere] sm:text-[1.75rem]">{org.name}</h1>
         <p className="mt-2 text-muted-foreground">You are {org.role === "owner" ? "an" : "a"} {ROLE_LABELS[org.role].toLowerCase()} of this organization.</p>
       </div>
 
@@ -194,7 +194,7 @@ function OrganizationPage() {
               </Button>
             </div>
             {invites.data && invites.data.length > 0 && (
-              <ul className="divide-y divide-border border border-border">
+              <ul className="rounded-xl divide-y divide-border border border-border">
                 {invites.data.map((i) => (
                   <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
                     <div className="min-w-0">

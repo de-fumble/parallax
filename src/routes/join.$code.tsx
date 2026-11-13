@@ -49,7 +49,7 @@ function JoinPage() {
         </div>
       ) : !user ? (
         <>
-          <h1 className="mt-4 text-4xl leading-tight">You've been invited to an organization</h1>
+          <h1 className="mt-4 text-3xl leading-tight">You've been invited to an organization</h1>
           <p className="mt-4 text-muted-foreground">
             Joining needs a personal Parallax account. Sign in, or create one, and you'll come straight back here.
           </p>
@@ -59,25 +59,25 @@ function JoinPage() {
         </>
       ) : invite.isError ? (
         <>
-          <h1 className="mt-4 text-4xl leading-tight">This invite couldn't be checked</h1>
+          <h1 className="mt-4 text-3xl leading-tight">This invite couldn't be checked</h1>
           <p className="mt-4 text-muted-foreground">{invite.error.message}</p>
         </>
       ) : !invite.data ? (
         <>
-          <h1 className="mt-4 text-4xl leading-tight">This invite is no longer valid</h1>
+          <h1 className="mt-4 text-3xl leading-tight">This invite is no longer valid</h1>
           <p className="mt-4 text-muted-foreground">It may have expired or been withdrawn. Ask whoever sent it for a new link.</p>
           <Button asChild variant="outline" className="mt-8"><Link to="/research">Go to your workspace</Link></Button>
         </>
       ) : invite.data.already_member ? (
         <>
-          <h1 className="mt-4 text-4xl leading-tight">You're already in {invite.data.org_name}</h1>
+          <h1 className="mt-4 text-3xl leading-tight">You're already in {invite.data.org_name}</h1>
           <Button className="mt-8" onClick={() => { switchTo(invite.data!.org_id); navigate({ to: "/research" }); }}>
             Open {invite.data.org_name}
           </Button>
         </>
       ) : (
         <>
-          <h1 className="mt-4 text-4xl leading-tight">Join {invite.data.org_name}</h1>
+          <h1 className="mt-4 text-3xl leading-tight">Join {invite.data.org_name}</h1>
           <p className="mt-4 text-muted-foreground">
             You'll join as <span className="text-foreground">{ROLE_LABELS[invite.data.role]}</span>, signed in as{" "}
             <span className="text-foreground">{user.email}</span>. Your personal workspace stays private and you can switch between the two at any time.

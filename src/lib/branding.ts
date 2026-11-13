@@ -122,8 +122,9 @@ export function themeVariables(primary: string, secondary: string): Record<strin
     "--primary-foreground": textOn(primary),
     "--ring": primary,
     "--chart-1": primary,
-    "--accent": primary,
-    "--accent-foreground": textOn(primary),
+    // Hover and selected surfaces: a whisper of the brand, never a solid block.
+    "--accent": tint(primary, 7),
+    "--accent-foreground": "#231f20",
     "--secondary": tint(secondary, 28),
     // The tints are light, so text on them stays dark.
     "--secondary-foreground": "#231f20",
